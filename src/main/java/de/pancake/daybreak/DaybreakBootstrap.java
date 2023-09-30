@@ -1,6 +1,9 @@
 package de.pancake.daybreak;
 
+import io.papermc.paper.plugin.bootstrap.BootstrapContext;
+import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import org.codehaus.plexus.util.FileUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -8,10 +11,10 @@ import java.nio.file.Path;
 import java.util.stream.Collectors;
 
 /**
- * Main class for the server. This overrides org.bukkit.craftbukkit.Main!
+ * Bootstrapper of the plugin
  * @author Pancake
  */
-public class ServerMain {
+public class DaybreakBootstrap implements PluginBootstrap {
 
     /** File indicating the server should be reset */
     public static final Path LOCK_FILE = Path.of("reset.lock");
@@ -21,11 +24,15 @@ public class ServerMain {
      * @param args Arguments for the server.
      * @throws Exception If something goes wrong.
      */
-    public static void main(String[] args) throws Exception {
+    @Override
+    public void bootstrap(@NotNull BootstrapContext context) {
         // check if server should reset
-        if (Files.exists(LOCK_FILE)) {
-            System.out.println("reset.lock found, resetting server...");
+        if (!Files.exists(LOCK_FILE))
+            return;
 
+        System.out.println("reset.lock found, resetting server...");
+
+        try {
             // read world data of survivors
             var survivors = Files.readAllLines(LOCK_FILE);
             var stats = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/stats/" + uuid + ".json"))));
@@ -47,17 +54,18 @@ public class ServerMain {
 
             // delete lock file
             Files.delete(LOCK_FILE);
+        } catch (Exception e) {
+            System.err.println("Failed to reset server!");
+            e.printStackTrace();
+            System.exit(-1);
         }
-
-        // launch server main
-        Class.forName("org.bukkit.craftbukkit.Main").getMethod("main", String[].class).invoke(null, (Object) args);
     }
 
     /**
      * Tries to read all bytes from a given file, crashing the jvm on failure.
      * @param path The path to the file.
      */
-    private static byte[] tryRead(Path path) {
+    private byte[] tryRead(Path path) {
         try {
             if (!Files.exists(path)) {
                 System.out.println("Warning! File " + path + " does not exist!");
@@ -78,7 +86,7 @@ public class ServerMain {
      * @param path The path to the file.
      * @param data The data to write.
      */
-    private static void tryWrite(Path path, byte[] data) {
+    private void tryWrite(Path path, byte[] data) {
         try {
             Files.write(path, data);
         } catch (Exception e) {
@@ -87,5 +95,4 @@ public class ServerMain {
             System.exit(-1);
         }
     }
-
 }

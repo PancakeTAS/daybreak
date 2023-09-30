@@ -1,0 +1,53 @@
+// Apply plugins required for project
+plugins {
+    // Add java library
+    id 'java-library'
+}
+
+// Update plugin information
+base {
+    group = "de.pancake"
+    archivesName = "daybreak"
+}
+
+// Compile with UTF-8
+compileJava.options.encoding = 'UTF-8'
+
+// Compile for java 21
+java {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
+}
+
+// Add repositories required for project
+repositories {
+    // Add maven central for lombok
+    mavenCentral()
+    // Add papermc repository for api
+    maven { url "https://papermc.io/repo/repository/maven-public/" }
+}
+
+// Add paper api
+dependencies {
+    // Add lombok processor
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    // Add paper mc api for compile time
+    compileOnly "io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT"
+}
+
+// Upload plugin to server [login via key]
+tasks.register('upload', Exec) {
+    workingDir "${buildDir}/libs"
+    commandLine "cmd.exe /k echo put daybreak.jar | sftp mgnetwork:/home/p2r3/daybreak/plugins/".split(" ")
+}
+
+// Restart preview server
+tasks.register('restartServer', Exec) {
+    workingDir "${buildDir}/libs"
+    commandLine "ssh mgnetwork daybreak restart".split(" ")
+}
+
+upload.dependsOn = ['build']
+upload.finalizedBy(restartServer)
+upload.group = 'daybreak'

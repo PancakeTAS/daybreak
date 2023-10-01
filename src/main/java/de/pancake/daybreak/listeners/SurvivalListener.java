@@ -101,7 +101,7 @@ public class SurvivalListener implements Listener {
         if (killer == null || killer == p)
             e.deathMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c died"));
         else
-            e.deathMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c was slain by §b" + killer.getName()));
+            e.deathMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c was slain by §6" + killer.getName()));
 
         this.plugin.kill(p.getUniqueId());
     }

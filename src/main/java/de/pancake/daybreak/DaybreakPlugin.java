@@ -4,6 +4,7 @@ import de.pancake.daybreak.commands.DaybreakCommand;
 import de.pancake.daybreak.listeners.SurvivalListener;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import net.kyori.adventure.text.Component;
 import org.bukkit.BanEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -11,7 +12,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.popcraft.chunky.api.ChunkyAPI;
 
 import java.nio.file.Files;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static de.pancake.daybreak.DaybreakBootstrap.LOCK_FILE;
 
@@ -52,6 +58,16 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
             this.getLogger().info("Chunk generation completed for world");
             this.online = true;
         });
+
+        // create automatic reset task
+        var executor = Executors.newScheduledThreadPool(4);
+        var now = LocalDateTime.now(Clock.systemUTC());
+        var secondsUntilMidnight = now.until(now.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0), ChronoUnit.SECONDS);
+        executor.schedule(() -> Bukkit.broadcast(Component.text("§6» §cThe server will reset in 5 minutes.")), Math.max(1, secondsUntilMidnight - 60*5), TimeUnit.SECONDS);
+        executor.schedule(() -> Bukkit.broadcast(Component.text("§6» §cThe server will reset in 60 seconds.")), Math.max(1, secondsUntilMidnight - 60), TimeUnit.SECONDS);
+        executor.schedule(() -> Bukkit.broadcast(Component.text("§6» §cThe server will reset in 30 seconds.")), Math.max(1, secondsUntilMidnight - 30), TimeUnit.SECONDS);
+        executor.schedule(() -> Bukkit.broadcast(Component.text("§6» §cThe server will reset in 5 seconds.")), Math.max(1, secondsUntilMidnight - 5), TimeUnit.SECONDS);
+        executor.schedule(() -> Bukkit.getScheduler().runTask(this, this::reset), secondsUntilMidnight, TimeUnit.SECONDS);
     }
 
     /**
@@ -71,8 +87,6 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         var ban = this.bans.remove(uniqueId);
         if (ban != null)
             ban.remove();
-
-        this.addSurvivor(uniqueId);
     }
 
     /**

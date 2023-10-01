@@ -8,7 +8,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static de.pancake.daybreak.DaybreakPlugin.LAST_SESSION;
 
 /**
  * Bootstrapper of the plugin
@@ -38,6 +41,9 @@ public class DaybreakBootstrap implements PluginBootstrap {
             var stats = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/stats/" + uuid + ".json"))));
             var playerdata = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/playerdata/" + uuid + ".dat"))));
             var advancements = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/advancements/" + uuid + ".json"))));
+
+            // save last session survivors
+            LAST_SESSION.addAll(survivors.stream().map(UUID::fromString).toList());
 
             // recursively delete world
             FileUtils.deleteDirectory(new File("world"));

@@ -11,10 +11,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.popcraft.chunky.api.ChunkyAPI;
 
 import java.nio.file.Files;
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static de.pancake.daybreak.DaybreakBootstrap.LOCK_FILE;
@@ -27,8 +23,8 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
 
     /** Size of the border */
     public static final int BORDER_RADIUS = 512;
-    /** Today's date */
-    public static final long TODAY = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), LocalDateTime.now(Clock.systemUTC()));
+    /** Survivors of last session */
+    public static final List<UUID> LAST_SESSION = new ArrayList<>();
 
     /** List of survivors */
     private final List<UUID> survivors = new ArrayList<>();

@@ -11,11 +11,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
 import static de.pancake.daybreak.DaybreakPlugin.BORDER_RADIUS;
-import static de.pancake.daybreak.DaybreakPlugin.TODAY;
+import static de.pancake.daybreak.DaybreakPlugin.LAST_SESSION;
 
 /**
  * Survival listener for the daybreak plugin.
@@ -54,7 +51,7 @@ public class SurvivalListener implements Listener {
             return;
 
         // check if player joined for the first time - spread out if true
-        if (player.getGameMode() == GameMode.ADVENTURE || ChronoUnit.DAYS.between(Instant.ofEpochMilli(0), Instant.ofEpochMilli(player.getLastSeen())) < TODAY) { // TODO: check if this works
+        if (player.getGameMode() == GameMode.ADVENTURE || LAST_SESSION.contains(player.getUniqueId())) {
             player.sendMessage(Component.text("""
                     §6» §c§lDaybreak
                     §6» §cWelcome to the server! You've been teleported to a random location.
@@ -102,7 +99,7 @@ public class SurvivalListener implements Listener {
 
         var killer = p.getKiller();
         if (killer == null || killer == p)
-            e.deathMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c died</gray>"));
+            e.deathMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c died"));
         else
             e.deathMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c was slain by §b" + killer.getName()));
 

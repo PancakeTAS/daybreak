@@ -4,11 +4,15 @@ import de.pancake.daybreak.DaybreakPlugin;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import static de.pancake.daybreak.DaybreakPlugin.BORDER_RADIUS;
 import static de.pancake.daybreak.DaybreakPlugin.LAST_SESSION;
@@ -69,6 +73,14 @@ public class SurvivalListener implements Listener {
             player.setGameMode(GameMode.SURVIVAL);
             player.setFallDistance(0f);
             player.teleport(location);
+
+            // first join benefits
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20*60*5, 1, true));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, 20*60*5, 0, true));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 20*60*5, 0, true));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20*60*5, 1, true));
+            player.getInventory().addItem(new ItemStack(Material.OAK_LOG, 8));
+            player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 6));
         }
 
         // add timer for adding player to survivors list

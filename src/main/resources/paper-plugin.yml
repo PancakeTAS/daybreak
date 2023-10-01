@@ -7,7 +7,7 @@ website: "https://mgnet.work"
 main: de.pancake.daybreak.DaybreakPlugin
 bootstrapper: de.pancake.daybreak.DaybreakBootstrap
 api-version: '1.20'
-load: POSTWORLD
+load: STARTUP
 
 dependencies:
   server:

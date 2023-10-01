@@ -1,5 +1,6 @@
 package de.pancake.daybreak.listeners;
 
+import de.pancake.daybreak.DaybreakPlugin;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -9,12 +10,24 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 
 /**
  * Misc listener for the daybreak plugin.
  * @author Pancake
  */
 public class MiscListener implements Listener {
+
+    /** Daybreak plugin instance */
+    private final DaybreakPlugin plugin;
+
+    /**
+     * Initialize misc listener.
+     * @param plugin Daybreak plugin instance.
+     */
+    public MiscListener(DaybreakPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     /**
      * Handle player join event.
@@ -43,6 +56,16 @@ public class MiscListener implements Listener {
     public void onPlayerChat(AsyncChatEvent e) {
         e.setCancelled(true);
         Bukkit.broadcast(Component.text("§6" + e.getPlayer().getName() + " §c» ").append(e.originalMessage().color(NamedTextColor.GRAY)));
+    }
+
+    /**
+     * Handle plugin enable event.
+     * @param e Plugin enable event.
+     */
+    @EventHandler
+    public void onPluginLoad(PluginEnableEvent e) {
+        if (e.getPlugin().getName().equals("Chunky"))
+            this.plugin.onChunkyInit(Bukkit.getWorld("world"));
     }
 
     /**

@@ -1,6 +1,7 @@
 package de.pancake.daybreak;
 
 import de.pancake.daybreak.commands.DaybreakCommand;
+import de.pancake.daybreak.generators.VanillaGenerator;
 import de.pancake.daybreak.listeners.CombatListener;
 import de.pancake.daybreak.listeners.MiscListener;
 import de.pancake.daybreak.listeners.SurvivalListener;
@@ -9,8 +10,12 @@ import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
 import org.bukkit.BanEntry;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.event.Listener;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.popcraft.chunky.api.ChunkyAPI;
 
 import java.nio.file.Files;
@@ -49,19 +54,8 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         // register commands and listeners
         Bukkit.getCommandMap().register("daybreak", "db", new DaybreakCommand(this));
         Bukkit.getPluginManager().registerEvents(new SurvivalListener(this), this);
-        Bukkit.getPluginManager().registerEvents(new MiscListener(), this);
+        Bukkit.getPluginManager().registerEvents(new MiscListener(this), this);
         Bukkit.getPluginManager().registerEvents(new CombatListener(this), this);
-
-        // set world border
-        Bukkit.getWorld("world").getWorldBorder().setSize(BORDER_RADIUS * 2);
-
-        // preload world
-        var chunky = Bukkit.getServer().getServicesManager().load(ChunkyAPI.class);
-        chunky.startTask("world", "square", 0, 0, BORDER_RADIUS, BORDER_RADIUS, "concentric");
-        chunky.onGenerationComplete(e -> {
-            this.getLogger().info("Chunk generation completed for world");
-            this.online = true;
-        });
 
         // create automatic reset task
         var executor = Executors.newScheduledThreadPool(4);
@@ -72,6 +66,34 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         executor.schedule(() -> Bukkit.broadcast(Component.text("§6» §cThe server will reset in 30 seconds.")), Math.max(1, secondsUntilMidnight - 30), TimeUnit.SECONDS);
         executor.schedule(() -> Bukkit.broadcast(Component.text("§6» §cThe server will reset in 5 seconds.")), Math.max(1, secondsUntilMidnight - 5), TimeUnit.SECONDS);
         executor.schedule(() -> Bukkit.getScheduler().runTask(this, this::reset), secondsUntilMidnight, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Initialize world.
+     * @param w World that was initialized
+     */
+    public void onChunkyInit(World w) {
+        // set world border
+        w.getWorldBorder().setSize(BORDER_RADIUS * 2);
+
+        // preload world
+        var chunky = Bukkit.getServer().getServicesManager().load(ChunkyAPI.class);
+        chunky.startTask("world", "square", 0, 0, BORDER_RADIUS + (16*16), BORDER_RADIUS + (16*16), "concentric");
+        chunky.onGenerationComplete(e -> {
+            this.getLogger().info("Chunk generation completed for world");
+            this.online = true;
+        });
+    }
+
+    /**
+     * Replace default world generator with custom one.
+     * @param worldName Name of the world that this will be applied to
+     * @param id Unique ID, if any, that was specified to indicate which generator was requested
+     * @return New vanilla generator
+     */
+    @Override
+    public @Nullable ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, @Nullable String id) {
+        return new VanillaGenerator();
     }
 
     /**

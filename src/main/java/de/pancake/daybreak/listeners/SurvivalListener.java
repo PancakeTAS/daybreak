@@ -4,15 +4,16 @@ import de.pancake.daybreak.DaybreakPlugin;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static de.pancake.daybreak.DaybreakPlugin.BORDER_RADIUS;
 import static de.pancake.daybreak.DaybreakPlugin.LAST_SESSION;
@@ -25,6 +26,9 @@ public class SurvivalListener implements Listener {
 
     /** Daybreak plugin instance */
     private final DaybreakPlugin plugin;
+
+    /** Players with spawn protection */
+    private final Map<Player, Long> spawnProtection = new HashMap<>();
 
     /**
      * Initialize survival listener.
@@ -65,22 +69,20 @@ public class SurvivalListener implements Listener {
                     §6» §cIf you die, you will be §6banned §cfor the rest of the day.
                     §6» §cIf you want to preserve your items to the next map,
                     §6» §cyou have to survive at least 5 minutes.
+                    §6» §c
+                    §6» §cYour spawn protection towards other players will expire in 5 minutes.
                     """));
 
+            // add spawn protection
+            this.spawnProtection.put(player, System.currentTimeMillis());
+
+            // spread player
             var x = (int) (Math.random() * BORDER_RADIUS * 2) - BORDER_RADIUS;
             var z = (int) (Math.random() * BORDER_RADIUS * 2) - BORDER_RADIUS;
             var location = player.getWorld().getHighestBlockAt(x, z).getLocation().add(0, 1, 0);
             player.setGameMode(GameMode.SURVIVAL);
             player.setFallDistance(0f);
             player.teleport(location);
-
-            // first join benefits
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20*60*5, 1, true));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, 20*60*5, 0, true));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 20*60*5, 0, true));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20*60*5, 1, true));
-            player.getInventory().addItem(new ItemStack(Material.OAK_LOG, 8));
-            player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 6));
         }
 
         // add timer for adding player to survivors list
@@ -91,6 +93,16 @@ public class SurvivalListener implements Listener {
             this.plugin.addSurvivor(player.getUniqueId());
             player.sendMessage(Component.text("§6» §cYou are now marked as a survivor"));
         }, 20L*60*5);
+    }
+
+    /**
+     * Handle player damage event.
+     * @param e Player damage event.
+     */
+    @EventHandler
+    public void onPlayerDamage(EntityDamageByEntityEvent e) {
+        if (e.getEntity() instanceof Player p && e.getDamager() instanceof Player && (System.currentTimeMillis() - this.spawnProtection.getOrDefault(p, 0L)) < 1000*60*5)
+            e.setCancelled(true);
     }
 
     /**

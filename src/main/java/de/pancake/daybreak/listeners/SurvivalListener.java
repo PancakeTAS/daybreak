@@ -34,7 +34,7 @@ public class SurvivalListener implements Listener {
 
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent e) {
-        if (!e.getPlayer().isOp() && !this.plugin.isOnline())
+        if (!this.plugin.isOnline())
             e.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, Component.text("§cThe server is still starting!"));
     }
 
@@ -59,7 +59,15 @@ public class SurvivalListener implements Listener {
 
         // check if player joined for the first time - spread out if true
         if (player.getGameMode() == GameMode.ADVENTURE || ChronoUnit.DAYS.between(Instant.ofEpochMilli(0), Instant.ofEpochMilli(player.getLastSeen())) < TODAY) { // TODO: check if this works
-            player.sendMessage(Component.text("§6» §cWelcome to the server! You've been spread out to a random location.")); // TODO: send more information to the player
+            player.sendMessage(Component.text("""
+                    §6» §c§lDaybreak
+                    §6» §cWelcome to the server! You've been teleported to a random location.
+                    §6» §c
+                    §6» §cDaybreak is a §6hardcore survival server §cthat resets every day.
+                    §6» §cIf you die, you will be §6banned §cfor the rest of the day.
+                    §6» §cIf you want to preserve your items to the next map,
+                    §6» §cyou have to survive at least 5 minutes.
+                    """));
 
             var x = (int) (Math.random() * BORDER_RADIUS * 2) - BORDER_RADIUS;
             var z = (int) (Math.random() * BORDER_RADIUS * 2) - BORDER_RADIUS;
@@ -67,11 +75,16 @@ public class SurvivalListener implements Listener {
             player.setGameMode(GameMode.SURVIVAL);
             player.setFallDistance(0f);
             player.teleport(location);
-            return;
         }
 
         // add timer for adding player to survivors list
-        // TODO: add timer
+        var login = player.getLastLogin();
+        Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+            if (player.getLastLogin() != login)
+                return;
+            this.plugin.addSurvivor(player.getUniqueId());
+            player.sendMessage(Component.text("§6» §cYou are now marked as a survivor"));
+        }, 200L);
     }
 
 }

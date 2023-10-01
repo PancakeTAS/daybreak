@@ -52,7 +52,7 @@ public class DaybreakCommand extends Command {
         } else if (args.length == 2 && "revive".equals(args[0])) {
 
             // revive player
-            var player = Bukkit.getPlayer(args[1]);
+            var player = Bukkit.getOfflinePlayer(args[1]);
             if (player != null && !this.plugin.isSurvivor(player.getUniqueId())) {
                 sender.sendMessage("§6» §cReviving §6" + args[1] + "§c...");
                 this.plugin.revive(player.getUniqueId());
@@ -62,7 +62,7 @@ public class DaybreakCommand extends Command {
         } else if (args.length == 2 && "kill".equals(args[0])) {
 
             // kill player
-            var player = Bukkit.getPlayer(args[1]);
+            var player = Bukkit.getOfflinePlayer(args[1]);
             if (player != null && this.plugin.isSurvivor(player.getUniqueId())) {
                 sender.sendMessage("§6» §cKilling §6" + args[1] + "§c...");
                 this.plugin.kill(player.getUniqueId());

@@ -4,6 +4,7 @@ import de.pancake.daybreak.commands.DaybreakCommand;
 import de.pancake.daybreak.listeners.SurvivalListener;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.bukkit.BanEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,9 +15,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static de.pancake.daybreak.DaybreakBootstrap.LOCK_FILE;
 
@@ -33,6 +32,8 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
 
     /** List of survivors */
     private final List<UUID> survivors = new ArrayList<>();
+    /** List of bans in this session */
+    private final Map<UUID, BanEntry<?>> bans = new HashMap<>();
     /** Whether the server is online */
     @Getter private boolean online = false;
 
@@ -66,12 +67,25 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         Bukkit.shutdown();
     }
 
+    /**
+     * Revive a player.
+     * @param uniqueId The unique id of the player.
+     */
     public void revive(UUID uniqueId) {
+        var ban = this.bans.remove(uniqueId);
+        if (ban != null)
+            ban.remove();
 
+        this.addSurvivor(uniqueId);
     }
 
+    /**
+     * Kill a player.
+     * @param uniqueId The unique id of the player.
+     */
     public void kill(UUID uniqueId) {
-
+        this.bans.put(uniqueId, Bukkit.getOfflinePlayer(uniqueId).banPlayer("§cYou died.\n\nYou will be unbanned at 00:00 UTC."));
+        this.removeSurvivor(uniqueId);
     }
 
     // Query survivors list

@@ -9,7 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 import static de.pancake.daybreak.DaybreakPlugin.BORDER_RADIUS;
 import static de.pancake.daybreak.DaybreakPlugin.LAST_SESSION;
@@ -31,6 +30,10 @@ public class SurvivalListener implements Listener {
         this.plugin = plugin;
     }
 
+    /**
+     * Handle player login event.
+     * @param e Player login event.
+     */
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent e) {
         if (!this.plugin.isOnline())
@@ -43,10 +46,8 @@ public class SurvivalListener implements Listener {
      */
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        var player = e.getPlayer();
-        e.joinMessage(Component.text("§6» §6" + player.getName() + "§c joined the game"));
-
         // check if player is already a survivor - return if true
+        var player = e.getPlayer();
         if (this.plugin.isSurvivor(player.getUniqueId()))
             return;
 
@@ -81,29 +82,12 @@ public class SurvivalListener implements Listener {
     }
 
     /**
-     * Handle player join event.
-     * @param e Player join event.
-     */
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent e) {
-        e.quitMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c left the game"));
-    }
-
-    /**
      * Handle player death event.
      * @param e Player death event.
      */
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
-        var p = e.getPlayer();
-
-        var killer = p.getKiller();
-        if (killer == null || killer == p)
-            e.deathMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c died"));
-        else
-            e.deathMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c was slain by §6" + killer.getName()));
-
-        this.plugin.kill(p.getUniqueId());
+        this.plugin.kill(e.getPlayer().getUniqueId());
     }
 
 }

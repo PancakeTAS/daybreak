@@ -23,6 +23,7 @@ public class MiscListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         e.joinMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c joined the game"));
+        e.getPlayer().sendPlayerListHeaderAndFooter(Component.text("§c§lDaybreak"), Component.text("§7The hardcore Minecraft server, which resets every 24 hours"));
     }
 
     /**

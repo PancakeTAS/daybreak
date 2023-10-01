@@ -26,8 +26,8 @@ public class MiscListener implements Listener {
     }
 
     /**
-     * Handle player join event.
-     * @param e Player join event.
+     * Handle player quit event.
+     * @param e Player quit event.
      */
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
@@ -35,8 +35,8 @@ public class MiscListener implements Listener {
     }
 
     /**
-     * Handle player join event.
-     * @param e Player join event.
+     * Handle player chat event.
+     * @param e Player chat event.
      */
     @EventHandler
     public void onPlayerChat(AsyncChatEvent e) {

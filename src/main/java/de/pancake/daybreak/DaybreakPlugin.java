@@ -1,6 +1,7 @@
 package de.pancake.daybreak;
 
 import de.pancake.daybreak.commands.DaybreakCommand;
+import de.pancake.daybreak.listeners.CombatListener;
 import de.pancake.daybreak.listeners.MiscListener;
 import de.pancake.daybreak.listeners.SurvivalListener;
 import lombok.Getter;
@@ -49,6 +50,7 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         Bukkit.getCommandMap().register("daybreak", "db", new DaybreakCommand(this));
         Bukkit.getPluginManager().registerEvents(new SurvivalListener(this), this);
         Bukkit.getPluginManager().registerEvents(new MiscListener(), this);
+        Bukkit.getPluginManager().registerEvents(new CombatListener(this), this);
 
         // set world border
         Bukkit.getWorld("world").getWorldBorder().setSize(BORDER_RADIUS * 2);

@@ -46,7 +46,7 @@ public class DaybreakCommand extends Command {
         if (args.length == 1 && "reset".equals(args[0])) {
 
             // reset server
-            sender.sendMessage("§6» §cResetting server...");
+            sender.sendMessage("§6» §cResetting server... (not automatically restarting!)");
             this.plugin.reset();
 
         } else if (args.length == 2 && "revive".equals(args[0])) {

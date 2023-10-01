@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.popcraft.chunky.api.ChunkyAPI;
 
+import java.nio.file.Files;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +17,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static de.pancake.daybreak.DaybreakBootstrap.LOCK_FILE;
 
 /**
  * Main class of the plugin.
@@ -54,8 +57,13 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         });
     }
 
+    /**
+     * Reset the world and preserve survivors.
+     */
+    @SneakyThrows
     public void reset() {
-
+        Files.write(LOCK_FILE, this.survivors.stream().map(UUID::toString).toList());
+        Bukkit.shutdown();
     }
 
     public void revive(UUID uniqueId) {

@@ -7,11 +7,12 @@ import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import static de.pancake.daybreak.DaybreakPlugin.BORDER_SIZE;
+import static de.pancake.daybreak.DaybreakPlugin.BORDER_RADIUS;
 import static de.pancake.daybreak.DaybreakPlugin.TODAY;
 
 /**
@@ -29,6 +30,12 @@ public class SurvivalListener implements Listener {
      */
     public SurvivalListener(DaybreakPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onPlayerLogin(PlayerLoginEvent e) {
+        if (!e.getPlayer().isOp() && !this.plugin.isOnline())
+            e.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, Component.text("§cThe server is still starting!"));
     }
 
     /**
@@ -54,8 +61,8 @@ public class SurvivalListener implements Listener {
         if (player.getGameMode() == GameMode.ADVENTURE || ChronoUnit.DAYS.between(Instant.ofEpochMilli(0), Instant.ofEpochMilli(player.getLastSeen())) < TODAY) { // TODO: check if this works
             player.sendMessage(Component.text("§6» §cWelcome to the server! You've been spread out to a random location.")); // TODO: send more information to the player
 
-            var x = (int) (Math.random() * BORDER_SIZE) - BORDER_SIZE / 2;
-            var z = (int) (Math.random() * BORDER_SIZE) - BORDER_SIZE / 2;
+            var x = (int) (Math.random() * BORDER_RADIUS * 2) - BORDER_RADIUS;
+            var z = (int) (Math.random() * BORDER_RADIUS * 2) - BORDER_RADIUS;
             var location = player.getWorld().getHighestBlockAt(x, z).getLocation().add(0, 1, 0);
             player.setGameMode(GameMode.SURVIVAL);
             player.setFallDistance(0f);

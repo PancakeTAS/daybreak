@@ -47,12 +47,5 @@ tasks.register('upload', Exec) {
     commandLine "cmd.exe /k echo put daybreak.jar | sftp mgnetwork:/home/p2r3/daybreak/plugins/".split(" ")
 }
 
-// Restart preview server
-tasks.register('restartServer', Exec) {
-    workingDir "${buildDir}/libs"
-    commandLine "ssh mgnetwork daybreak restart".split(" ")
-}
-
 upload.dependsOn = ['build']
-upload.finalizedBy(restartServer)
 upload.group = 'daybreak'

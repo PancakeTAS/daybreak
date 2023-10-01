@@ -56,7 +56,7 @@ public class CombatListener implements Listener {
      */
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-        if (this.timers.getOrDefault(e.getPlayer(), 0) > 0)
+        if (this.timers.getOrDefault(e.getPlayer(), 0) > 0 && !e.getPlayer().isDead())
             e.getPlayer().setHealth(0);
     }
 

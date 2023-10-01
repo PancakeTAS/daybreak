@@ -41,21 +41,6 @@ public class SurvivalListener implements Listener {
     }
 
     /**
-     * Handle player death event.
-     * @param e Player death event.
-     */
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent e) {
-        var p = e.getPlayer();
-        if (p.isOp()) {
-            p.kick(Component.text("§cYou died.\n\nYou are an operator, so you will not be banned."));
-        } else {
-            p.banPlayer("§cYou died.\n\nYou will be unbanned at 00:00 UTC.").save();
-            p.banPlayerIP("§cYou died.\n\nYou will be unbanned at 00:00 UTC.").save();
-        }
-    }
-
-    /**
      * Handle player join event.
      * @param e Player join event.
      */
@@ -105,6 +90,23 @@ public class SurvivalListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
         e.quitMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c left the game"));
+    }
+
+    /**
+     * Handle player death event.
+     * @param e Player death event.
+     */
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        var p = e.getPlayer();
+
+        var killer = p.getKiller();
+        if (killer == null || killer == p)
+            e.deathMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c died</gray>"));
+        else
+            e.deathMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c was slain by §b" + killer.getName()));
+
+        this.plugin.kill(p.getUniqueId());
     }
 
 }

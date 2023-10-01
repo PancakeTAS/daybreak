@@ -84,8 +84,13 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
      * @param uniqueId The unique id of the player.
      */
     public void kill(UUID uniqueId) {
-        this.bans.put(uniqueId, Bukkit.getOfflinePlayer(uniqueId).banPlayer("§cYou died.\n\nYou will be unbanned at 00:00 UTC."));
         this.removeSurvivor(uniqueId);
+
+        var player = Bukkit.getOfflinePlayer(uniqueId);
+        if (player.isOp())
+            return;
+
+        this.bans.put(uniqueId, player.banPlayer("§cYou died.\n\nYou will be unbanned at 00:00 UTC."));
     }
 
     // Query survivors list

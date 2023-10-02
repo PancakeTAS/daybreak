@@ -27,6 +27,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static de.pancake.daybreak.DaybreakBootstrap.LOCK_FILE;
+import static de.pancake.daybreak.DaybreakBootstrap.SURVIVORS_FILE;
 
 /**
  * Main class of the plugin.
@@ -57,6 +58,10 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new MiscListener(this), this);
         Bukkit.getPluginManager().registerEvents(new CombatListener(this), this);
 
+        // load survivors
+        if (Files.exists(SURVIVORS_FILE))
+            this.survivors.addAll(Files.readAllLines(SURVIVORS_FILE).stream().map(UUID::fromString).toList());
+
         // create automatic reset task
         var executor = Executors.newScheduledThreadPool(4);
         var now = LocalDateTime.now(Clock.systemUTC());
@@ -66,6 +71,15 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         executor.schedule(() -> Bukkit.broadcast(Component.text("§6» §cThe server will reset in 30 seconds.")), Math.max(1, secondsUntilMidnight - 30), TimeUnit.SECONDS);
         executor.schedule(() -> Bukkit.broadcast(Component.text("§6» §cThe server will reset in 5 seconds.")), Math.max(1, secondsUntilMidnight - 5), TimeUnit.SECONDS);
         executor.schedule(() -> Bukkit.getScheduler().runTask(this, this::reset), secondsUntilMidnight, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Disable daybreak plugin
+     */
+    @Override @SneakyThrows
+    public void onDisable() {
+        // save survivors
+        Files.write(SURVIVORS_FILE, this.survivors.stream().map(UUID::toString).toList());
     }
 
     /**

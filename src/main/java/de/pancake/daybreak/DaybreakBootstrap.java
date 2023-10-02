@@ -21,6 +21,8 @@ public class DaybreakBootstrap implements PluginBootstrap {
 
     /** File indicating the server should be reset */
     public static final Path LOCK_FILE = Path.of("reset.lock");
+    /** File listing survivors inbetween resets */
+    public static final Path SURVIVORS_FILE = Path.of("survivors.txt");
 
     /**
      * Main method for the server.
@@ -62,6 +64,7 @@ public class DaybreakBootstrap implements PluginBootstrap {
 
             // delete lock file
             Files.delete(LOCK_FILE);
+            Files.delete(SURVIVORS_FILE);
         } catch (Exception e) {
             System.err.println("Failed to reset server!");
             e.printStackTrace();

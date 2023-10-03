@@ -8,9 +8,9 @@ import de.pancake.daybreak.listeners.SurvivalListener;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
-import org.bukkit.BanEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,12 +22,15 @@ import java.nio.file.Files;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static de.pancake.daybreak.DaybreakBootstrap.*;
+import static de.pancake.daybreak.DaybreakBootstrap.LAST_SESSION_FILE;
+import static de.pancake.daybreak.DaybreakBootstrap.SURVIVORS_FILE;
 
 /**
  * Main class of the plugin.
@@ -42,8 +45,6 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
     private final List<UUID> survivors = new LinkedList<>();
     /** List of survivors from last session */
     public final List<UUID> lastSession = new LinkedList<>();
-    /** List of bans in this session */
-    private final Map<UUID, BanEntry<?>> bans = new HashMap<>();
     /** Whether the server is online */
     @Getter private boolean online = false;
 
@@ -128,27 +129,15 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
     }
 
     /**
-     * Revive a player.
-     * @param uniqueId The unique id of the player.
-     */
-    public void revive(UUID uniqueId) {
-        var ban = this.bans.remove(uniqueId);
-        if (ban != null)
-            ban.remove();
-    }
-
-    /**
      * Kill a player.
      * @param uniqueId The unique id of the player.
      */
-    public void kill(UUID uniqueId) {
-        this.removeSurvivor(uniqueId);
-
-        var player = Bukkit.getOfflinePlayer(uniqueId);
-        if (player.isOp())
+    public void kill(Player p) {
+        if (p.isOp())
             return;
 
-        this.bans.put(uniqueId, player.banPlayer("§cYou died.\n\nYou will be unbanned at 00:00 UTC."));
+        this.removeSurvivor(p.getUniqueId());
+        p.banPlayer("§cYou died.\n\nYou will be unbanned at 00:00 UTC.");
     }
 
     // Query survivors list

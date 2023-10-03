@@ -4,7 +4,6 @@ import de.pancake.daybreak.DaybreakPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public class DaybreakCommand extends Command {
      * @param plugin Daybreak plugin instance.
      */
     public DaybreakCommand(DaybreakPlugin plugin) {
-        super("daybreak", "Daybreak's main command", "/daybreak <reset/revive/kill>", List.of("db"));
+        super("daybreak", "Daybreak's main command", "/daybreak <reset>", List.of("db"));
         this.plugin = plugin;
     }
 
@@ -49,28 +48,8 @@ public class DaybreakCommand extends Command {
             sender.sendMessage("§6» §cResetting server...");
             this.plugin.reset();
 
-        } else if (args.length == 2 && "revive".equals(args[0])) {
-
-            // revive player
-            var player = Bukkit.getOfflinePlayer(args[1]);
-            if (player != null && !this.plugin.isSurvivor(player.getUniqueId())) {
-                sender.sendMessage("§6» §cReviving §6" + args[1] + "§c...");
-                this.plugin.revive(player.getUniqueId());
-            } else
-                sender.sendMessage("§6» §cPlayer §6" + args[1] + "§c is not dead!");
-
-        } else if (args.length == 2 && "kill".equals(args[0])) {
-
-            // kill player
-            var player = Bukkit.getOfflinePlayer(args[1]);
-            if (player != null && this.plugin.isSurvivor(player.getUniqueId())) {
-                sender.sendMessage("§6» §cKilling §6" + args[1] + "§c...");
-                this.plugin.kill(player.getUniqueId());
-            } else
-                sender.sendMessage("§6» §cPlayer §6" + args[1] + "§c is already dead!");
-
         } else
-            sender.sendMessage("§6» §cCommand usage: §6/daybreak §c<§6reset§c|§6revive§c|§6kill§c>");
+            sender.sendMessage("§6» §cCommand usage: §6/daybreak §c<§6reset§c>");
 
         return true;
     }
@@ -85,10 +64,6 @@ public class DaybreakCommand extends Command {
      */
     @Override
     public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
-        if (args.length < 2)
-            return List.of("reset", "revive", "kill");
-        else if (args.length == 2)
-            return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.startsWith(args[1])).toList();
-        return null;
+        return List.of("reset");
     }
 }

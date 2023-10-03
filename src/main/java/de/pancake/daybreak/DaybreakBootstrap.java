@@ -40,9 +40,9 @@ public class DaybreakBootstrap implements PluginBootstrap {
         try {
             // read world data of survivors
             var survivors = Files.readAllLines(LOCK_FILE);
-            var stats = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/stats/" + uuid + ".json"))));
-            var playerdata = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/playerdata/" + uuid + ".dat"))));
-            var advancements = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/advancements/" + uuid + ".json"))));
+            var stats = survivors.stream().distinct().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/stats/" + uuid + ".json"))));
+            var playerdata = survivors.stream().distinct().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/playerdata/" + uuid + ".dat"))));
+            var advancements = survivors.stream().distinct().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/advancements/" + uuid + ".json"))));
             // recursively delete world
             FileUtils.deleteDirectory(new File("world"));
             Files.deleteIfExists(Path.of("banned-ips.json"));

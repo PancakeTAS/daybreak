@@ -139,7 +139,6 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
 
         this.removeSurvivor(p.getUniqueId());
         p.setGameMode(GameMode.SPECTATOR);
-        p.setHealth(0.0);
         p.getInventory().clear();
         p.setExp(0.0f);
         p.banPlayer("§cYou died.\n\nYou will be unbanned at 00:00 UTC.");

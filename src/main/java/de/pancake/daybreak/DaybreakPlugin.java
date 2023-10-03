@@ -62,12 +62,12 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         // load survivors
         if (Files.exists(SURVIVORS_FILE))
             this.survivors.addAll(Files.readAllLines(SURVIVORS_FILE).stream().map(UUID::fromString).distinct().toList());
-        this.getSLF4JLogger().info("In this session, there are " + this.survivors.size() + " survivors:\n\t" + this.survivors.stream().map(Object::toString).collect(Collectors.joining("\n    ")));
+        this.getSLF4JLogger().info("In this session, there are " + this.survivors.size() + " survivors:\n    " + this.survivors.stream().map(Object::toString).collect(Collectors.joining("\n    ")));
 
         // load last session survivors
         if (Files.exists(LAST_SESSION_FILE))
             this.lastSession.addAll(Files.readAllLines(LAST_SESSION_FILE).stream().map(UUID::fromString).distinct().toList());
-        this.getSLF4JLogger().info("From the previous session, there are " + this.lastSession.size() + " survivors that have yet to join:\n\t" + this.lastSession.stream().map(Object::toString).collect(Collectors.joining("\n    ")));
+        this.getSLF4JLogger().info("From the previous session, there are " + this.lastSession.size() + " survivors that have yet to join:\n    " + this.lastSession.stream().map(Object::toString).collect(Collectors.joining("\n    ")));
 
         // create automatic reset task
         var executor = Executors.newScheduledThreadPool(4);

@@ -5,6 +5,7 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -45,6 +46,9 @@ public class MiscListener implements Listener {
      */
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
+        if (e.getPlayer().getGameMode() == GameMode.SPECTATOR || e.getPlayer().isDead() || e.getPlayer().getHealth() < 0.01)
+            return;
+
         e.quitMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c left the game"));
     }
 

@@ -59,7 +59,7 @@ public class SurvivalListener implements Listener {
             return;
 
         // check if player joined for the first time - spread out if true
-        if (player.getGameMode() == GameMode.ADVENTURE || this.plugin.removeLastSessionSurvivor(player.getUniqueId())) {
+        if (player.getGameMode() != GameMode.SURVIVAL || this.plugin.removeLastSessionSurvivor(player.getUniqueId())) {
             player.sendMessage(Component.text("""
                     §6» §c§lDaybreak
                     §6» §cWelcome to the server! You've been teleported to a random location.
@@ -80,6 +80,7 @@ public class SurvivalListener implements Listener {
             var z = (int) (Math.random() * BORDER_RADIUS * 2) - BORDER_RADIUS;
             var location = player.getWorld().getHighestBlockAt(x, z).getLocation().add(0, 1, 0);
             player.setGameMode(GameMode.SURVIVAL);
+            player.setHealth(20.0f);
             player.setFallDistance(0f);
             player.teleport(location);
         }

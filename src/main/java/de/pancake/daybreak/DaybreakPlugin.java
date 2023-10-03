@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -137,6 +138,10 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
             return;
 
         this.removeSurvivor(p.getUniqueId());
+        p.setGameMode(GameMode.SPECTATOR);
+        p.setHealth(0.0);
+        p.getInventory().clear();
+        p.setExp(0.0f);
         p.banPlayer("§cYou died.\n\nYou will be unbanned at 00:00 UTC.");
     }
 

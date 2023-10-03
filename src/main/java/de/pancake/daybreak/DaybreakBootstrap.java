@@ -43,6 +43,7 @@ public class DaybreakBootstrap implements PluginBootstrap {
             var stats = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/stats/" + uuid + ".json"))));
             var playerdata = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/playerdata/" + uuid + ".dat"))));
             var advancements = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/advancements/" + uuid + ".json"))));
+            stats.forEach((a, b) -> System.out.println("Preserving playerdata for: " + a));
 
             // save last session survivors
             LAST_SESSION.addAll(survivors.stream().map(UUID::fromString).toList());

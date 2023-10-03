@@ -60,7 +60,10 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
 
         // load survivors
         if (Files.exists(SURVIVORS_FILE))
-            this.survivors.addAll(Files.readAllLines(SURVIVORS_FILE).stream().map(UUID::fromString).toList());
+            this.survivors.addAll(Files.readAllLines(SURVIVORS_FILE).stream().map(a -> {
+                System.out.println("Adding survivor from before server restart: " + a);
+                return UUID.fromString(a);
+            }).toList());
 
         // create automatic reset task
         var executor = Executors.newScheduledThreadPool(4);

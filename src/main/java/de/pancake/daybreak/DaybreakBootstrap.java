@@ -45,8 +45,8 @@ public class DaybreakBootstrap implements PluginBootstrap {
             var advancements = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/advancements/" + uuid + ".json"))));
             // recursively delete world
             FileUtils.deleteDirectory(new File("world"));
-            Files.delete(Path.of("banned-ips.json"));
-            Files.delete(Path.of("banned-players.json"));
+            Files.deleteIfExists(Path.of("banned-ips.json"));
+            Files.deleteIfExists(Path.of("banned-players.json"));
 
             // recreate folder structures
             Files.createDirectories(Path.of("world/stats"));
@@ -59,7 +59,7 @@ public class DaybreakBootstrap implements PluginBootstrap {
             advancements.forEach((uuid, data) -> tryWrite(Path.of("world/advancements/" + uuid + ".json"), data));
 
             // delete lock file
-            Files.delete(SURVIVORS_FILE);
+            Files.deleteIfExists(SURVIVORS_FILE);
             Files.move(LOCK_FILE, LAST_SESSION_FILE, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             System.err.println("Failed to reset server!");

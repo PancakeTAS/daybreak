@@ -25,9 +25,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import static de.pancake.daybreak.DaybreakBootstrap.LOCK_FILE;
-import static de.pancake.daybreak.DaybreakBootstrap.SURVIVORS_FILE;
+import static de.pancake.daybreak.DaybreakBootstrap.*;
 
 /**
  * Main class of the plugin.
@@ -37,11 +37,11 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
 
     /** Size of the border */
     public static final int BORDER_RADIUS = 512;
-    /** Survivors of last session */
-    public static final List<UUID> LAST_SESSION = new ArrayList<>();
 
     /** List of survivors */
-    private final List<UUID> survivors = new ArrayList<>();
+    private final List<UUID> survivors = new LinkedList<>();
+    /** List of survivors from last session */
+    public final List<UUID> lastSession = new LinkedList<>();
     /** List of bans in this session */
     private final Map<UUID, BanEntry<?>> bans = new HashMap<>();
     /** Whether the server is online */
@@ -60,10 +60,13 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
 
         // load survivors
         if (Files.exists(SURVIVORS_FILE))
-            this.survivors.addAll(Files.readAllLines(SURVIVORS_FILE).stream().map(a -> {
-                System.out.println("Adding survivor from before server restart: " + a);
-                return UUID.fromString(a);
-            }).toList());
+            this.survivors.addAll(Files.readAllLines(SURVIVORS_FILE).stream().map(UUID::fromString).toList());
+        this.getSLF4JLogger().info("In this session, there are " + this.survivors.size() + " survivors:\n" + this.survivors.stream().map(Object::toString).collect(Collectors.joining("\n    ")));
+
+        // load last session survivors
+        if (Files.exists(LAST_SESSION_FILE))
+            this.lastSession.addAll(Files.readAllLines(LAST_SESSION_FILE).stream().map(UUID::fromString).toList());
+        this.getSLF4JLogger().info("From the previous session, there are " + this.survivors.size() + " survivors that have yet to join:\n" + this.survivors.stream().map(Object::toString).collect(Collectors.joining("\n    ")));
 
         // create automatic reset task
         var executor = Executors.newScheduledThreadPool(4);
@@ -118,7 +121,8 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
      */
     @SneakyThrows
     public void reset() {
-        Files.write(LOCK_FILE, this.survivors.stream().map(UUID::toString).toList());
+        Files.write(SURVIVORS_FILE, this.survivors.stream().map(UUID::toString).toList()); // write survivors of this world to file
+        Files.write(LAST_SESSION_FILE, this.lastSession.stream().map(UUID::toString).toList()); // write survivors of previous world, that haven't joined yet, to file
         Bukkit.shutdown();
     }
 
@@ -171,6 +175,15 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
      */
     public void removeSurvivor(UUID uniqueId) {
         this.survivors.remove(uniqueId);
+    }
+
+    /**
+     * Remove a player from the survivors list if they joined for the first time.
+     * @param uniqueId The unique id of the player.
+     * @return True if the player joined for the first time, false otherwise.
+     */
+    public boolean removeLastSessionSurvivor(UUID uniqueId) {
+        return this.lastSession.remove(uniqueId);
     }
 
 }

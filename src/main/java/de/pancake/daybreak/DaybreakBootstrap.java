@@ -8,10 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.UUID;
+import java.nio.file.StandardCopyOption;
 import java.util.stream.Collectors;
-
-import static de.pancake.daybreak.DaybreakPlugin.LAST_SESSION;
 
 /**
  * Bootstrapper of the plugin
@@ -23,6 +21,8 @@ public class DaybreakBootstrap implements PluginBootstrap {
     public static final Path LOCK_FILE = Path.of("reset.lock");
     /** File listing survivors inbetween resets */
     public static final Path SURVIVORS_FILE = Path.of("survivors.txt");
+    /** File listing survivors inbetween resets */
+    public static final Path LAST_SESSION_FILE = Path.of("last_survivors.txt");
 
     /**
      * Main method for the server.
@@ -43,11 +43,6 @@ public class DaybreakBootstrap implements PluginBootstrap {
             var stats = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/stats/" + uuid + ".json"))));
             var playerdata = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/playerdata/" + uuid + ".dat"))));
             var advancements = survivors.stream().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/advancements/" + uuid + ".json"))));
-            stats.forEach((a, b) -> System.out.println("Preserving playerdata for: " + a));
-
-            // save last session survivors
-            LAST_SESSION.addAll(survivors.stream().map(UUID::fromString).toList());
-
             // recursively delete world
             FileUtils.deleteDirectory(new File("world"));
             Files.delete(Path.of("banned-ips.json"));
@@ -64,8 +59,8 @@ public class DaybreakBootstrap implements PluginBootstrap {
             advancements.forEach((uuid, data) -> tryWrite(Path.of("world/advancements/" + uuid + ".json"), data));
 
             // delete lock file
-            Files.delete(LOCK_FILE);
             Files.delete(SURVIVORS_FILE);
+            Files.move(LOCK_FILE, LAST_SESSION_FILE, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             System.err.println("Failed to reset server!");
             e.printStackTrace();

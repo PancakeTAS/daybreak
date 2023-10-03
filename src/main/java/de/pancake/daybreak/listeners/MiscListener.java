@@ -48,6 +48,7 @@ public class MiscListener implements Listener {
      */
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
+        e.quitMessage(null);
         if (e.getPlayer().getGameMode() == GameMode.SPECTATOR || e.getPlayer().isDead() || e.getPlayer().getHealth() < 0.01)
             return;
 
@@ -85,7 +86,7 @@ public class MiscListener implements Listener {
 
         var msg = LegacyComponentSerializer.legacySection().serialize(e.deathMessage()).replace(p.getName(), "§6" + p.getName() + "§c");
 
-        if (killer == null || killer == p)
+        if (killer != null && killer != p)
             msg = msg.replace(killer.getName(), "§6" + killer.getName() + "§c");
 
         if (p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.CUSTOM)

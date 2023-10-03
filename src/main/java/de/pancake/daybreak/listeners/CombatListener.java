@@ -56,8 +56,11 @@ public class CombatListener implements Listener {
      */
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-        if (this.timers.getOrDefault(e.getPlayer(), 0) > 0 && !e.getPlayer().isDead())
-            e.getPlayer().setHealth(0);
+        var p = e.getPlayer();
+        if (this.timers.getOrDefault(p, 0) > 0 && !p.isDead()) {
+            p.setLastDamageCause(new EntityDamageEvent(p, EntityDamageEvent.DamageCause.CUSTOM, 1000));
+            p.setHealth(0);
+        }
     }
 
 }

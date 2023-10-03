@@ -4,10 +4,12 @@ import de.pancake.daybreak.DaybreakPlugin;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -81,10 +83,15 @@ public class MiscListener implements Listener {
         var p = e.getPlayer();
         var killer = p.getKiller();
 
+        var msg = LegacyComponentSerializer.legacySection().serialize(e.deathMessage()).replace(p.getName(), "§6" + p.getName() + "§c");
+
         if (killer == null || killer == p)
-            e.deathMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c died"));
-        else
-            e.deathMessage(Component.text("§6» §6" + e.getPlayer().getName() + "§c was slain by §6" + killer.getName()));
+            msg = msg.replace(killer.getName(), "§6" + killer.getName() + "§c");
+
+        if (p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.CUSTOM)
+            msg = "§6" + p.getName() + "§c logged out during combat!";
+
+        e.deathMessage(Component.text("§6» §c" + msg));
     }
 
 }

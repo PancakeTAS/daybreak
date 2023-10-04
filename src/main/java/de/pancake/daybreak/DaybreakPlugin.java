@@ -130,7 +130,7 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
 
     /**
      * Kill a player.
-     * @param uniqueId The unique id of the player.
+     * @param p Player to kill.
      */
     public void kill(Player p) {
         if (p.isOp())

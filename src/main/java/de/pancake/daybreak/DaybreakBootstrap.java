@@ -25,9 +25,8 @@ public class DaybreakBootstrap implements PluginBootstrap {
     public static final Path LAST_SESSION_FILE = Path.of("last_survivors.txt");
 
     /**
-     * Main method for the server.
-     * @param args Arguments for the server.
-     * @throws Exception If something goes wrong.
+     * Bootstraps the plugin.
+     * @param context The bootstrap context.
      */
     @Override
     public void bootstrap(@NotNull BootstrapContext context) {

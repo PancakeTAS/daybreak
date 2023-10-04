@@ -1,7 +1,6 @@
 package de.pancake.daybreak.listeners;
 
 import de.pancake.daybreak.DaybreakPlugin;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,6 +10,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 /**
  * Combat listener for the daybreak plugin.
@@ -32,9 +33,9 @@ public class CombatListener implements Listener {
                 this.timers.put(entry.getKey(), val);
 
                 if (val > 0)
-                    entry.getKey().sendActionBar(Component.text("§cYou are in combat. Do not log off."));
+                    entry.getKey().sendActionBar(miniMessage().deserialize("<red>You are in combat. Do not log off.</red>"));
                 else if (val == 0)
-                    entry.getKey().sendActionBar(Component.text("§aYou are no longer in combat."));
+                    entry.getKey().sendActionBar(miniMessage().deserialize("<green>You are no longer in combat.</green>"));
 
             }
         }, 0, 20);

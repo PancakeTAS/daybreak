@@ -7,7 +7,6 @@ import de.pancake.daybreak.listeners.MiscListener;
 import de.pancake.daybreak.listeners.SurvivalListener;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
@@ -31,6 +30,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static de.pancake.daybreak.DaybreakBootstrap.*;
+import static de.pancake.daybreak.listeners.SurvivalListener.PREFIX;
+import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 /**
  * Main class of the plugin.
@@ -73,10 +74,10 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         var executor = Executors.newScheduledThreadPool(4);
         var now = LocalDateTime.now(Clock.systemUTC());
         var secondsUntilMidnight = now.until(now.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0), ChronoUnit.SECONDS);
-        executor.schedule(() -> Bukkit.broadcast(Component.text("§6» §cThe server will reset in 5 minutes.")), Math.max(1, secondsUntilMidnight - 60*5), TimeUnit.SECONDS);
-        executor.schedule(() -> Bukkit.broadcast(Component.text("§6» §cThe server will reset in 60 seconds.")), Math.max(1, secondsUntilMidnight - 60), TimeUnit.SECONDS);
-        executor.schedule(() -> Bukkit.broadcast(Component.text("§6» §cThe server will reset in 30 seconds.")), Math.max(1, secondsUntilMidnight - 30), TimeUnit.SECONDS);
-        executor.schedule(() -> Bukkit.broadcast(Component.text("§6» §cThe server will reset in 5 seconds.")), Math.max(1, secondsUntilMidnight - 5), TimeUnit.SECONDS);
+        executor.schedule(() -> Bukkit.broadcast(miniMessage().deserialize("<prefix>The server will reset in 5 minutes.", PREFIX)), Math.max(1, secondsUntilMidnight - 60*5), TimeUnit.SECONDS);
+        executor.schedule(() -> Bukkit.broadcast(miniMessage().deserialize("<prefix>The server will reset in 60 seconds.", PREFIX)), Math.max(1, secondsUntilMidnight - 60), TimeUnit.SECONDS);
+        executor.schedule(() -> Bukkit.broadcast(miniMessage().deserialize("<prefix>The server will reset in 30 seconds.", PREFIX)), Math.max(1, secondsUntilMidnight - 30), TimeUnit.SECONDS);
+        executor.schedule(() -> Bukkit.broadcast(miniMessage().deserialize("<prefix>The server will reset in 5 seconds.", PREFIX)), Math.max(1, secondsUntilMidnight - 5), TimeUnit.SECONDS);
         executor.schedule(() -> Bukkit.getScheduler().runTask(this, this::reset), secondsUntilMidnight, TimeUnit.SECONDS);
     }
 
@@ -139,7 +140,7 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         p.setGameMode(GameMode.SPECTATOR);
         p.getInventory().clear();
         p.setExp(0.0f);
-        p.banPlayer("§cYou died.\n\nYou will be unbanned at 00:00 UTC.");
+        p.banPlayer("§cYou died. You will be unbanned at 00:00 UTC.");
     }
 
     // Query survivors list

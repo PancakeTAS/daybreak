@@ -8,6 +8,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static de.pancake.daybreak.listeners.SurvivalListener.PREFIX;
+import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
+
 /**
  * Daybreak's main command.
  * @author Pancake
@@ -45,11 +48,11 @@ public class DaybreakCommand extends Command {
         if (args.length == 1 && "reset".equals(args[0])) {
 
             // reset server
-            sender.sendMessage("§6» §cResetting server...");
+            sender.sendMessage(miniMessage().deserialize("<prefix>Resetting server...", PREFIX));
             this.plugin.reset();
 
         } else
-            sender.sendMessage("§6» §cCommand usage: §6/daybreak §c<§6reset§c>");
+            sender.sendMessage(miniMessage().deserialize("<prefix>Command usage: <gold>/daybreak</gold> <red><</red><gold>reset</gold><red>></red>", PREFIX));
 
         return true;
     }

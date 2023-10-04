@@ -9,6 +9,8 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -23,6 +25,10 @@ public class DaybreakBootstrap implements PluginBootstrap {
     public static final Path SURVIVORS_FILE = Path.of("survivors.txt");
     /** File listing survivors inbetween resets */
     public static final Path LAST_SESSION_FILE = Path.of("last_survivors.txt");
+    /** Has server been reset */
+    public static boolean RESET = false;
+    /** List of deaths from last reset */
+    public static List<UUID> LAST_DEATHS;
 
     /**
      * Bootstraps the plugin.
@@ -42,6 +48,17 @@ public class DaybreakBootstrap implements PluginBootstrap {
             var stats = survivors.stream().distinct().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/stats/" + uuid + ".json"))));
             var playerdata = survivors.stream().distinct().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/playerdata/" + uuid + ".dat"))));
             var advancements = survivors.stream().distinct().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/advancements/" + uuid + ".json"))));
+
+            // read deaths
+            try (var stream = Files.list(Path.of("world/playerdata/"))) {
+                LAST_DEATHS = stream
+                    .filter(path -> !path.getFileName().toString().contains("dat_old") && !survivors.contains(path.getFileName().toString().split("\\.dat")[0]))
+                    .map(c -> UUID.fromString(c.getFileName().toString().split("\\.dat")[0]))
+                    .collect(Collectors.toList());
+            } catch (Exception e) {
+                System.err.println("Unable to find list players");
+            }
+
             // recursively delete world
             FileUtils.deleteDirectory(new File("world"));
             Files.deleteIfExists(Path.of("banned-ips.json"));
@@ -60,6 +77,8 @@ public class DaybreakBootstrap implements PluginBootstrap {
             // delete lock file
             Files.deleteIfExists(SURVIVORS_FILE);
             Files.move(LOCK_FILE, LAST_SESSION_FILE, StandardCopyOption.REPLACE_EXISTING);
+
+            RESET = true;
         } catch (Exception e) {
             System.err.println("Failed to reset server!");
             e.printStackTrace();

@@ -3,7 +3,6 @@ package de.pancake.daybreak.listeners;
 import de.pancake.daybreak.DaybreakPlugin;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
@@ -17,6 +16,7 @@ import org.bukkit.event.server.PluginEnableEvent;
 import static de.pancake.daybreak.listeners.SurvivalListener.PREFIX;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 import static net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.*;
+import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection;
 
 /**
  * Misc listener for the daybreak plugin.
@@ -88,7 +88,8 @@ public class MiscListener implements Listener {
         var p = e.getPlayer();
         var killer = p.getKiller();
 
-        var msg = LegacyComponentSerializer.legacySection().serialize(e.deathMessage()).replace(p.getName(), "<gold>" + p.getName() + "</gold><red>");
+        var omsg = legacySection().serialize(e.deathMessage());
+        var msg = omsg.replace(p.getName(), "<gold>" + p.getName() + "</gold><red>");
 
         if (killer != null && killer != p)
             msg = msg.replace(killer.getName(), "<gold>" + killer.getName() + "</gold><red>");
@@ -97,6 +98,7 @@ public class MiscListener implements Listener {
             msg = "<gold>" + p.getName() + "</gold> <red>logged out during combat!";
 
         e.deathMessage(miniMessage().deserialize("<prefix><msg>", PREFIX, parsed("msg", msg)));
+        this.plugin.webhookExecutor.sendDeathMessage(p, killer, omsg);
     }
 
 }

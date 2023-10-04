@@ -5,6 +5,7 @@ import de.pancake.daybreak.generators.VanillaGenerator;
 import de.pancake.daybreak.listeners.CombatListener;
 import de.pancake.daybreak.listeners.MiscListener;
 import de.pancake.daybreak.listeners.SurvivalListener;
+import de.pancake.daybreak.webhook.WebhookExecutor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
@@ -47,6 +48,8 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
     private final List<UUID> survivors = new LinkedList<>();
     /** List of survivors from last session */
     public final List<UUID> lastSession = new LinkedList<>();
+    /** Webhook executor */
+    public final WebhookExecutor webhookExecutor = new WebhookExecutor();
     /** Whether the server is online */
     @Getter private boolean online = false;
 
@@ -106,7 +109,12 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         chunky.onGenerationComplete(e -> {
             this.getLogger().info("Chunk generation completed for world");
             this.online = true;
+
+            // send reset webhook if server has reset
+            if (RESET)
+                Bukkit.getScheduler().runTask(this, () -> this.webhookExecutor.sendResetMessage(this));
         });
+
     }
 
     /**

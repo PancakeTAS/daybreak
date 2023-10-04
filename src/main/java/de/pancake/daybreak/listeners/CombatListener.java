@@ -28,14 +28,17 @@ public class CombatListener implements Listener {
      */
     public CombatListener(DaybreakPlugin plugin) {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-            for (var entry : this.timers.entrySet()) {
+            var entrySet = this.timers.entrySet();
+            for (var entry : entrySet) {
                 int val = entry.getValue() - 1;
                 this.timers.put(entry.getKey(), val);
 
-                if (val > 0)
+                if (val > 0) {
                     entry.getKey().sendActionBar(miniMessage().deserialize("<red>You are in combat. Do not log off.</red>"));
-                else if (val == 0)
+                } else if (val <= 0) {
                     entry.getKey().sendActionBar(miniMessage().deserialize("<green>You are no longer in combat.</green>"));
+                    entrySet.remove(entry);
+                }
 
             }
         }, 0, 20);
@@ -58,7 +61,7 @@ public class CombatListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         var p = e.getPlayer();
-        if (this.timers.getOrDefault(p, 0) > 0 && !p.isDead()) {
+        if (this.timers.containsKey(p) && !p.isDead()) {
             p.setLastDamageCause(new EntityDamageEvent(p, EntityDamageEvent.DamageCause.CUSTOM, 1000));
             p.setHealth(0);
         }

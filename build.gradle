@@ -42,10 +42,24 @@ dependencies {
 }
 
 // Upload plugin to server [login via key]
-tasks.register('upload', Exec) {
+tasks.register('deployProduction', Exec) {
     workingDir "${buildDir}/libs"
     commandLine "cmd.exe /k echo put daybreak.jar | sftp mgnetwork:/home/p2r3/daybreak/plugins/".split(" ")
 }
 
-upload.dependsOn = ['build']
-upload.group = 'daybreak'
+tasks.register('deployAlpha', Exec) {
+    workingDir "${buildDir}/libs"
+    commandLine "cmd.exe /k echo put daybreak.jar | sftp mgnetwork:/home/p2r3/daybreak-alpha/plugins/".split(" ")
+}
+
+tasks.register('restartAlpha', Exec) {
+    workingDir "${buildDir}/libs"
+    commandLine "ssh mgnetwork daybreakalpha restart".split(" ")
+}
+
+deployProduction.dependsOn = ['build']
+deployProduction.group = 'daybreak'
+
+deployAlpha.dependsOn = ['build']
+deployAlpha.finalizedBy = ['restartAlpha']
+deployAlpha.group = 'daybreak'

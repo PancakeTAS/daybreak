@@ -30,8 +30,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static de.pancake.daybreak.DaybreakBootstrap.LAST_SESSION_FILE;
-import static de.pancake.daybreak.DaybreakBootstrap.SURVIVORS_FILE;
+import static de.pancake.daybreak.DaybreakBootstrap.*;
 
 /**
  * Main class of the plugin.
@@ -124,8 +123,7 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
      */
     @SneakyThrows
     public void reset() {
-        Files.write(SURVIVORS_FILE, this.survivors.stream().map(UUID::toString).toList()); // write survivors of this world to file
-        Files.write(LAST_SESSION_FILE, this.lastSession.stream().map(UUID::toString).toList()); // write survivors of previous world, that haven't joined yet, to file
+        Files.write(LOCK_FILE, this.survivors.stream().map(UUID::toString).toList()); // write survivors of this world to file
         Bukkit.shutdown();
     }
 

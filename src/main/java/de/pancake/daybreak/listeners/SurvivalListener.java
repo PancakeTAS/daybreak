@@ -1,7 +1,7 @@
 package de.pancake.daybreak.listeners;
 
 import de.pancake.daybreak.DaybreakPlugin;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -16,12 +16,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static de.pancake.daybreak.DaybreakPlugin.BORDER_RADIUS;
+import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
+import static net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.parsed;
 
 /**
  * Survival listener for the daybreak plugin.
  * @author Pancake
  */
 public class SurvivalListener implements Listener {
+
+    /** Prefix for messages */
+    public final static TagResolver.Single PREFIX = parsed("prefix", "<gold>»</gold> <red>");
 
     /** Daybreak plugin instance */
     private final DaybreakPlugin plugin;
@@ -44,7 +49,7 @@ public class SurvivalListener implements Listener {
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent e) {
         if (!this.plugin.isOnline())
-            e.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, Component.text("§cThe server is still starting!"));
+            e.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, miniMessage().deserialize("<red>The server is still starting!</red>"));
     }
 
     /**
@@ -60,17 +65,17 @@ public class SurvivalListener implements Listener {
 
         // check if player joined for the first time - spread out if true
         if (player.getGameMode() != GameMode.SURVIVAL || this.plugin.removeLastSessionSurvivor(player.getUniqueId())) {
-            player.sendMessage(Component.text("""
-                    §6» §c§lDaybreak
-                    §6» §cWelcome to the server! You've been teleported to a random location.
-                    §6» §c
-                    §6» §cDaybreak is a §6hardcore survival server §cthat resets every day.
-                    §6» §cIf you die, you will be §6banned §cfor the rest of the day.
-                    §6» §cIf you want to preserve your items to the next map,
-                    §6» §cyou have to survive at least 5 minutes.
-                    §6» §c
-                    §6» §cYour spawn protection towards other players will expire in 5 minutes.
-                    """));
+            player.sendMessage(miniMessage().deserialize("""
+                    <prefix><bold>Daybreak</bold>
+                    <prefix>Welcome to the server! You've been teleported to a random location.
+                    <prefix>
+                    <prefix>Daybreak is a <gold>hardcore survival server</gold> <red>that resets every day.</red>
+                    <prefix>If you die, you will be <gold>banned</gold> <red>for the rest of the day.</red>
+                    <prefix>If you want to preserve your items to the next map,
+                    <prefix>you have to survive at least 5 minutes.
+                    <prefix>
+                    <prefix>Your spawn protection towards other players will expire in 5 minutes.
+                    """, PREFIX));
 
             // add spawn protection
             this.spawnProtection.put(player, System.currentTimeMillis());
@@ -91,7 +96,7 @@ public class SurvivalListener implements Listener {
             if (player.getLastLogin() != login)
                 return;
             this.plugin.addSurvivor(player.getUniqueId());
-            player.sendMessage(Component.text("§6» §cYou are now marked as a survivor"));
+            player.sendMessage(miniMessage().deserialize("<prefix>You are now marked as a survivor", PREFIX));
         }, 20L*60*5);
     }
 

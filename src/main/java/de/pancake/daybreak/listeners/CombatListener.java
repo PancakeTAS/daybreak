@@ -28,8 +28,7 @@ public class CombatListener implements Listener {
      */
     public CombatListener(DaybreakPlugin plugin) {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-            var entrySet = this.timers.entrySet();
-            for (var entry : entrySet) {
+            for (var entry : new HashMap<>(this.timers).entrySet()) {
                 int val = entry.getValue() - 1;
                 this.timers.put(entry.getKey(), val);
 
@@ -37,7 +36,7 @@ public class CombatListener implements Listener {
                     entry.getKey().sendActionBar(miniMessage().deserialize("<red>You are in combat. Do not log off.</red>"));
                 } else if (val <= 0) {
                     entry.getKey().sendActionBar(miniMessage().deserialize("<green>You are no longer in combat.</green>"));
-                    entrySet.remove(entry);
+                    this.timers.remove(entry.getKey());
                 }
 
             }

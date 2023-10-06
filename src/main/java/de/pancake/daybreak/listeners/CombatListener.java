@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
@@ -22,7 +23,10 @@ import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 public class CombatListener implements Listener {
 
     /** Players currently in combat */
-    private final Map<Player, Integer> timers = new HashMap<>();
+    public final Map<Player, Integer> timers = new HashMap<>();
+
+    /** Players currently in the quitting process */
+    public final Map<Player, Integer> disconnects = new HashMap<>();
 
     /** Players that will be kicked and are allowed to disconnect without punishment */
     private final List<Player> safe = new ArrayList<>();
@@ -36,8 +40,8 @@ public class CombatListener implements Listener {
      */
     public CombatListener(DaybreakPlugin plugin) {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-            var entrySet = this.timers.entrySet();
-            for (var entry : entrySet) {
+            // Handle combat
+            for (var entry : new HashMap<>(this.timers).entrySet()) {
                 int val = entry.getValue() - 1;
                 this.timers.put(entry.getKey(), val);
 
@@ -45,7 +49,22 @@ public class CombatListener implements Listener {
                     entry.getKey().sendActionBar(miniMessage().deserialize("<red>You are in combat. Do not log off.</red>"));
                 } else if (val <= 0) {
                     entry.getKey().sendActionBar(miniMessage().deserialize("<green>You are no longer in combat.</green>"));
-                    entrySet.remove(entry);
+                    this.timers.remove(entry.getKey());
+                }
+
+            }
+
+            // Handle disconnects
+            for (var entry : new HashMap<>(this.disconnects).entrySet()) {
+                int val = entry.getValue() - 1;
+                this.disconnects.put(entry.getKey(), val);
+
+                if (val > 0) {
+                    entry.getKey().sendActionBar(miniMessage().deserialize("<gold>Disconnecting in " + val + "</gold>"));
+                } else if (val <= 0) {
+                    this.disconnects.remove(entry.getKey());
+                    this.safe.add(entry.getKey());
+                    entry.getKey().kick(miniMessage().deserialize("<prefix><green>You have safely disconnected.</green>", PREFIX));
                 }
 
             }
@@ -66,8 +85,33 @@ public class CombatListener implements Listener {
     }
 
     /**
+     * Handle player move event.
+     * @param e Player move event.
+     */
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        var p = e.getPlayer();
+        if (this.disconnects.containsKey(p) && e.getFrom().toBlock().toVector().distance(e.getTo().toBlock().toVector()) > 0.1) {
+            this.disconnects.remove(p);
+            p.sendMessage(miniMessage().deserialize("<prefix><red>You moved. You are no longer disconnecting.</red>", PREFIX));
+        }
+    }
+
+    /**
      * Handle player damage event.
      * @param e Player damage event.
+     */
+    @EventHandler
+    public void onDamage(EntityDamageEvent e) {
+        if (e.getEntity() instanceof Player p && this.disconnects.containsKey(p)) {
+            this.disconnects.remove(p);
+            p.sendMessage(miniMessage().deserialize("<prefix><red>You took damage. You are no longer disconnecting.</red>", PREFIX));
+        }
+    }
+
+    /**
+     * Handle player damage by entity event.
+     * @param e Player damage by entity event.
      */
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent e) {

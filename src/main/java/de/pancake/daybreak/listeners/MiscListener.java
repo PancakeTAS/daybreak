@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -83,7 +84,7 @@ public class MiscListener implements Listener {
      * Handle player death event.
      * @param e Player death event.
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH) // run after other event handlers
     public void onPlayerDeath(PlayerDeathEvent e) {
         var p = e.getPlayer();
         var killer = p.getKiller();

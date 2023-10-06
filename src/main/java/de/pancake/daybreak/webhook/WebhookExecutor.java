@@ -16,11 +16,14 @@ import java.net.http.HttpResponse;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static de.pancake.daybreak.DaybreakBootstrap.LAST_DEATHS;
+import static de.pancake.daybreak.DaybreakPlugin.HEADS_KEY;
+import static de.pancake.daybreak.DaybreakPlugin.HEADS_TYPE;
 
 /**
  * This class is used to execute the webhooks.
@@ -43,12 +46,23 @@ public class WebhookExecutor {
     public void sendDeathMessage(Player p, Player k, String msg) {
         var embed = Embed.builder();
 
+        // grab player head information
+        var headCollection = (Map<UUID, Integer>) p.getPersistentDataContainer().getOrDefault(HEADS_KEY, HEADS_TYPE, new HashMap<UUID, Integer>());
+        var total = headCollection.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
+        var heads = headCollection.entrySet().stream().map(e -> "- " + e.getValue() + "x " + getPlayerName(e.getKey())).collect(Collectors.joining("\n"));
+
         // create base embed
         embed.title(msg.replaceAll("§.", ""))
             .description("""
-            %P% will be unbanned %T%."""
+            %P% will be unbanned %T%.
+            
+            They've lost %H% player head%HS%:
+            %HEADS%"""
                     .replace("%P%", p.getName())
-                    .replace("%T%", "<t:"  + LocalDateTime.now(Clock.systemUTC()).plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0).toEpochSecond(ZoneOffset.UTC) + ":R>"))
+                    .replace("%T%", "<t:"  + LocalDateTime.now(Clock.systemUTC()).plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0).toEpochSecond(ZoneOffset.UTC) + ":R>")
+                    .replace("%H%", total + "")
+                    .replace("%HS%", total == 1 ? "" : "s")
+                    .replace("%HEADS%", heads))
             .color(0x9F23EB)
             .thumbnail(Image.builder().url("https://crafatar.com/avatars/" + p.getUniqueId() + "?overlay").build());
 

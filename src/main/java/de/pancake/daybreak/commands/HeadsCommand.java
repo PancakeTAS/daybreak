@@ -21,7 +21,7 @@ import static de.pancake.daybreak.listeners.SurvivalListener.PREFIX;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 /**
- * Daybreak's main command.
+ * Daybreak's head collection command.
  * @author Pancake
  */
 public class HeadsCommand extends Command {

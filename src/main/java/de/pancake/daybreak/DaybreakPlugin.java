@@ -5,12 +5,14 @@ import de.pancake.daybreak.generators.VanillaGenerator;
 import de.pancake.daybreak.listeners.CombatListener;
 import de.pancake.daybreak.listeners.MiscListener;
 import de.pancake.daybreak.listeners.SurvivalListener;
+import de.pancake.daybreak.pdc.HeadCollectionDataType;
 import de.pancake.daybreak.webhook.WebhookExecutor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -24,9 +26,7 @@ import java.nio.file.Files;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -43,6 +43,8 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
 
     /** Size of the border */
     public static final int BORDER_RADIUS = 512;
+    /** Data type of the head collection */
+    public static final HeadCollectionDataType HEAD_COLLECTION_DATA_TYPE = new HeadCollectionDataType();
 
     /** List of survivors */
     private final List<UUID> survivors = new LinkedList<>();
@@ -50,6 +52,8 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
     public final List<UUID> lastSession = new LinkedList<>();
     /** Webhook executor */
     public final WebhookExecutor webhookExecutor = new WebhookExecutor();
+    /** Head collection key */
+    private final NamespacedKey headsKey = new NamespacedKey(this, "heads");
     /** Whether the server is online */
     @Getter private boolean online = false;
 
@@ -145,6 +149,21 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
     public void kill(Player p, Component reason) {
         if (p.isOp())
             return;
+
+        // add head to killer
+        var killer = p.getKiller();
+        if (killer != null) {
+            var pdc = killer.getPersistentDataContainer();
+
+            // update head collection data
+            var data = (Map<UUID, Integer>) pdc.getOrDefault(headsKey, HEAD_COLLECTION_DATA_TYPE, new HashMap<UUID, Integer>());
+            data.put(p.getUniqueId(), data.getOrDefault(p.getUniqueId(), 0) + 1);
+            pdc.set(headsKey, HEAD_COLLECTION_DATA_TYPE, data);
+
+            // send message to killer
+            var total = data.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
+            killer.sendMessage(miniMessage().deserialize("<prefix>You have collected the head of <gold>" + p.getName() + "</gold>. You now have <gold>" + total + "</gold> head" + (total == 1 ? "" : "s") + ".", PREFIX));
+        }
 
         this.removeSurvivor(p.getUniqueId());
         p.setGameMode(GameMode.SPECTATOR);

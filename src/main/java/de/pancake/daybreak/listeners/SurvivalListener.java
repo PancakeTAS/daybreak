@@ -72,13 +72,13 @@ public class SurvivalListener implements Listener {
                     <prefix>Daybreak is a <gold>hardcore survival server</gold> <red>that resets every day.</red>
                     <prefix>If you die, you will be <gold>banned</gold> <red>for the rest of the day.</red>
                     <prefix>If you want to preserve your items to the next map,
-                    <prefix>you have to survive at least 5 minutes.
-                    <prefix>
-                    <prefix>Your spawn protection towards other players will expire in 5 minutes.
-                    """, PREFIX));
+                    <prefix>you have to survive at least 5 minutes.""", PREFIX));
 
             // add spawn protection
-            this.spawnProtection.put(player, System.currentTimeMillis());
+            if (player.getInventory().isEmpty()) {
+                this.spawnProtection.put(player, System.currentTimeMillis());
+                player.sendMessage(miniMessage().deserialize("<prefix>\n<prefix>Your spawn protection towards other players will expire in 5 minutes.", PREFIX));
+            }
 
             // spread player
             var x = (int) (Math.random() * BORDER_RADIUS * 2) - BORDER_RADIUS;
@@ -106,8 +106,19 @@ public class SurvivalListener implements Listener {
      */
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof Player p && e.getDamager() instanceof Player && (System.currentTimeMillis() - this.spawnProtection.getOrDefault(p, 0L)) < 1000*60*5)
-            e.setCancelled(true);
+        if (e.getEntity() instanceof Player p && e.getDamager() instanceof Player k) {
+            // victim has spawn protection
+            if (System.currentTimeMillis() - this.spawnProtection.getOrDefault(p, 0L) < 1000*60*5) {
+                k.sendMessage(miniMessage().deserialize("<prefix><red>This player has spawn protection!", PREFIX));
+                e.setCancelled(true);
+            }
+
+            // attacker has spawn protection
+            else if (System.currentTimeMillis() - this.spawnProtection.getOrDefault(k, 0L) < 1000*60*5) {
+                k.sendMessage(miniMessage().deserialize("<prefix><red>You have spawn protection!", PREFIX));
+                e.setCancelled(true);
+            }
+        }
     }
 
     /**

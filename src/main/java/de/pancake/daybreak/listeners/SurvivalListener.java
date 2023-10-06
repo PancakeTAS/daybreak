@@ -116,7 +116,7 @@ public class SurvivalListener implements Listener {
      */
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
-        this.plugin.kill(e.getPlayer());
+        this.plugin.kill(e.getPlayer(), e.deathMessage());
     }
 
 }

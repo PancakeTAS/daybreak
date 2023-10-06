@@ -44,7 +44,9 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
     /** Size of the border */
     public static final int BORDER_RADIUS = 512;
     /** Data type of the head collection */
-    public static final HeadCollectionDataType HEAD_COLLECTION_DATA_TYPE = new HeadCollectionDataType();
+    public static final HeadCollectionDataType HEADS_TYPE = new HeadCollectionDataType();
+    /** Head collection key */
+    public static final NamespacedKey HEADS_KEY = new NamespacedKey("daybreak", "heads");
 
     /** List of survivors */
     private final List<UUID> survivors = new LinkedList<>();
@@ -52,8 +54,6 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
     public final List<UUID> lastSession = new LinkedList<>();
     /** Webhook executor */
     public final WebhookExecutor webhookExecutor = new WebhookExecutor();
-    /** Head collection key */
-    private final NamespacedKey headsKey = new NamespacedKey(this, "heads");
     /** Whether the server is online */
     @Getter private boolean online = false;
 
@@ -156,9 +156,9 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
             var pdc = killer.getPersistentDataContainer();
 
             // update head collection data
-            var data = (Map<UUID, Integer>) pdc.getOrDefault(headsKey, HEAD_COLLECTION_DATA_TYPE, new HashMap<UUID, Integer>());
+            var data = (Map<UUID, Integer>) pdc.getOrDefault(HEADS_KEY, HEADS_TYPE, new HashMap<UUID, Integer>());
             data.put(p.getUniqueId(), data.getOrDefault(p.getUniqueId(), 0) + 1);
-            pdc.set(headsKey, HEAD_COLLECTION_DATA_TYPE, data);
+            pdc.set(HEADS_KEY, HEADS_TYPE, data);
 
             // send message to killer
             var total = data.entrySet().stream().mapToInt(Map.Entry::getValue).sum();

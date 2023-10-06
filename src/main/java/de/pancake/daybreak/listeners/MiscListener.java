@@ -5,11 +5,13 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginEnableEvent;
@@ -78,6 +80,17 @@ public class MiscListener implements Listener {
     public void onPluginLoad(PluginEnableEvent e) {
         if (e.getPlugin().getName().equals("Chunky"))
             this.plugin.onChunkyInit(Bukkit.getWorld("world"));
+    }
+
+    /**
+     * Handle inventory click event.
+     * @param e Inventory click event.
+     */
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        var item = e.getInventory().getItem(0);
+        if (!e.getWhoClicked().isOp() && item != null && item.getType() == Material.PLAYER_HEAD)
+            e.setCancelled(true);
     }
 
     /**

@@ -1,6 +1,7 @@
 package de.pancake.daybreak;
 
 import de.pancake.daybreak.commands.DaybreakCommand;
+import de.pancake.daybreak.commands.HeadsCommand;
 import de.pancake.daybreak.generators.VanillaGenerator;
 import de.pancake.daybreak.listeners.CombatListener;
 import de.pancake.daybreak.listeners.MiscListener;
@@ -61,8 +62,11 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
      */
     @Override @SneakyThrows
     public void onEnable() {
-        // register commands and listeners
+        // register commands
         Bukkit.getCommandMap().register("daybreak", "db", new DaybreakCommand(this));
+        Bukkit.getCommandMap().register("headcollection", "heads", new HeadsCommand());
+
+        // register listeners
         Bukkit.getPluginManager().registerEvents(new SurvivalListener(this), this);
         Bukkit.getPluginManager().registerEvents(new MiscListener(this), this);
         Bukkit.getPluginManager().registerEvents(new CombatListener(this), this);

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static de.pancake.daybreak.listeners.SurvivalListener.PREFIX;
+import static de.pancake.daybreak.DaybreakPlugin.PREFIX;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 /**

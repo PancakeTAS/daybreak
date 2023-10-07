@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
 
-import static de.pancake.daybreak.listeners.SurvivalListener.PREFIX;
+import static de.pancake.daybreak.DaybreakPlugin.PREFIX;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 /**

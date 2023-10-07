@@ -17,7 +17,7 @@ import java.util.UUID;
 
 import static de.pancake.daybreak.DaybreakPlugin.HEADS_KEY;
 import static de.pancake.daybreak.DaybreakPlugin.HEADS_TYPE;
-import static de.pancake.daybreak.listeners.SurvivalListener.PREFIX;
+import static de.pancake.daybreak.DaybreakPlugin.PREFIX;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 /**

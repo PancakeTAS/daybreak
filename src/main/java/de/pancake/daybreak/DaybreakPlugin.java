@@ -19,6 +19,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,6 +50,8 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
     public static final HeadCollectionDataType HEADS_TYPE = new HeadCollectionDataType();
     /** Head collection key */
     public static final NamespacedKey HEADS_KEY = new NamespacedKey("daybreak", "heads");
+    /** Crown key */
+    public static final NamespacedKey CROWN_KEY = new NamespacedKey("daybreak", "crown");
 
     /** List of survivors */
     private final List<UUID> survivors = new LinkedList<>();
@@ -159,26 +162,69 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
             return;
 
         // add head to killer
-        var killer = p.getKiller();
-        if (killer != null) {
-            var pdc = killer.getPersistentDataContainer();
+        this.addPlayerHead(p);
 
-            // update head collection data
-            var data = (Map<UUID, Integer>) pdc.getOrDefault(HEADS_KEY, HEADS_TYPE, new HashMap<UUID, Integer>());
-            data.put(p.getUniqueId(), data.getOrDefault(p.getUniqueId(), 0) + 1);
-            pdc.set(HEADS_KEY, HEADS_TYPE, data);
+        // update crown of players
+        this.addPlayerCrown(p);
 
-            // send message to killer
-            var total = data.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
-            killer.sendMessage(miniMessage().deserialize("<prefix>You have collected the head of <gold>" + p.getName() + "</gold>. You now have <gold>" + total + "</gold> head" + (total == 1 ? "" : "s") + ".", PREFIX));
-        }
-
+        // remove player
         this.removeSurvivor(p.getUniqueId());
         p.setGameMode(GameMode.SPECTATOR);
         p.getInventory().clear();
         p.setExp(0.0f);
         p.kick(reason);
         p.banPlayer("§cYou died. You will be unbanned at 0:00 UTC.");
+    }
+
+    /**
+     * Add a player head to the killer.
+     * @param p Player to add head of.
+     */
+    private void addPlayerHead(Player p) {
+        var killer = p.getKiller();
+        if (killer == null)
+            return;
+
+        var pdc = killer.getPersistentDataContainer();
+
+        // update head collection data
+        var data = (Map<UUID, Integer>) pdc.getOrDefault(HEADS_KEY, HEADS_TYPE, new HashMap<UUID, Integer>());
+        data.put(p.getUniqueId(), data.getOrDefault(p.getUniqueId(), 0) + 1);
+        pdc.set(HEADS_KEY, HEADS_TYPE, data);
+
+        // send message to killer
+        var total = data.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
+        killer.sendMessage(miniMessage().deserialize("<prefix>You have collected the head of <gold>" + p.getName() + "</gold>. You now have <gold>" + total + "</gold> head" + (total == 1 ? "" : "s") + ".", PREFIX));
+    }
+
+    /**
+     * Transfer crown to the killer.
+     * @param p Player to transfer crown from.
+     */
+    private void addPlayerCrown(Player p) {
+        var killer = p.getKiller();
+        if (killer == null)
+            return;
+
+        var sourcePdc = p.getPersistentDataContainer();
+        var targetPdc = killer.getPersistentDataContainer();
+
+        // get crown of player
+        var crown = sourcePdc.getOrDefault(CROWN_KEY, PersistentDataType.INTEGER, 0);
+        if (crown == 0)
+            return;
+
+        // get crown of killer
+        var killerCrown = targetPdc.getOrDefault(CROWN_KEY, PersistentDataType.INTEGER, 0);
+        if (killerCrown >= crown)
+            return;
+
+        // transfer crown
+        targetPdc.set(CROWN_KEY, PersistentDataType.INTEGER, crown);
+        sourcePdc.set(CROWN_KEY, PersistentDataType.INTEGER, killerCrown);
+
+        // send message to killer
+        killer.sendMessage(miniMessage().deserialize("<prefix>You stole the <gold>Golden Crown</gold> from <gold>" + p.getName() + "</gold>.", PREFIX));
     }
 
     // Query survivors list

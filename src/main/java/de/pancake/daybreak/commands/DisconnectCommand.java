@@ -1,7 +1,6 @@
 package de.pancake.daybreak.commands;
 
 import de.pancake.daybreak.DaybreakPlugin;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -9,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static de.pancake.daybreak.listeners.SurvivalListener.PREFIX;
+import static de.pancake.daybreak.DaybreakPlugin.PREFIX;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 /**

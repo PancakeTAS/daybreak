@@ -12,6 +12,7 @@ import de.pancake.daybreak.webhook.WebhookExecutor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.NamespacedKey;
@@ -35,8 +36,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static de.pancake.daybreak.DaybreakBootstrap.*;
-import static de.pancake.daybreak.listeners.SurvivalListener.PREFIX;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
+import static net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.parsed;
 
 /**
  * Main class of the plugin.
@@ -52,6 +53,8 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
     public static final NamespacedKey HEADS_KEY = new NamespacedKey("daybreak", "heads");
     /** Crown key */
     public static final NamespacedKey CROWN_KEY = new NamespacedKey("daybreak", "crown");
+    /** Prefix for messages */
+    public final static TagResolver.Single PREFIX = parsed("prefix", "<gold>»</gold> <red>");
 
     /** List of survivors */
     private final List<UUID> survivors = new LinkedList<>();

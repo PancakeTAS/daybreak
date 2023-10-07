@@ -5,6 +5,7 @@ import de.pancake.daybreak.commands.DisconnectCommand;
 import de.pancake.daybreak.commands.HeadsCommand;
 import de.pancake.daybreak.generators.VanillaGenerator;
 import de.pancake.daybreak.listeners.CombatListener;
+import de.pancake.daybreak.listeners.CrownListener;
 import de.pancake.daybreak.listeners.MiscListener;
 import de.pancake.daybreak.listeners.SurvivalListener;
 import de.pancake.daybreak.pdc.HeadCollectionDataType;
@@ -80,6 +81,7 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new SurvivalListener(this), this);
         Bukkit.getPluginManager().registerEvents(new MiscListener(this), this);
         Bukkit.getPluginManager().registerEvents(combatListener = new CombatListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new CrownListener(), this);
 
         // load survivors
         if (Files.exists(SURVIVORS_FILE))

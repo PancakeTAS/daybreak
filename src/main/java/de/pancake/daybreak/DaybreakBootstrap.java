@@ -2,6 +2,7 @@ package de.pancake.daybreak;
 
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.codehaus.plexus.util.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +25,9 @@ public class DaybreakBootstrap implements PluginBootstrap {
     /** File listing survivors inbetween resets */
     public static final Path LAST_SESSION_FILE = Path.of("last_survivors.txt");
 
+    /** The logger of the plugin */
+    private ComponentLogger logger;
+
     /**
      * Bootstraps the plugin.
      * @param context The bootstrap context.
@@ -34,7 +38,8 @@ public class DaybreakBootstrap implements PluginBootstrap {
         if (!Files.exists(LOCK_FILE))
             return;
 
-        System.out.println("reset.lock found, resetting server...");
+        this.logger = context.getLogger();
+        this.logger.info("reset.lock found, resetting server...");
 
         try {
             // read world data of survivors
@@ -61,7 +66,7 @@ public class DaybreakBootstrap implements PluginBootstrap {
             Files.deleteIfExists(SURVIVORS_FILE);
             Files.move(LOCK_FILE, LAST_SESSION_FILE, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
-            System.err.println("Failed to reset server!");
+            this.logger.error("reset.lock found, resetting server...");
             e.printStackTrace();
             System.exit(-1);
         }
@@ -74,13 +79,13 @@ public class DaybreakBootstrap implements PluginBootstrap {
     private byte[] tryRead(Path path) {
         try {
             if (!Files.exists(path)) {
-                System.out.println("Warning! File " + path + " does not exist!");
+                this.logger.info("Warning! File " + path + " does not exist!");
                 return new byte[0];
             }
 
             return Files.readAllBytes(path);
         } catch (Exception e) {
-            System.err.println("Failed to read file " + path + "!");
+            this.logger.error("Failed to read file " + path + "!");
             e.printStackTrace();
             System.exit(-1);
         }
@@ -96,7 +101,7 @@ public class DaybreakBootstrap implements PluginBootstrap {
         try {
             Files.write(path, data);
         } catch (Exception e) {
-            System.err.println("Failed to write file " + path + "!");
+            this.logger.error("Failed to write file " + path + "!");
             e.printStackTrace();
             System.exit(-1);
         }

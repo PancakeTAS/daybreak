@@ -7,6 +7,7 @@ import de.pancake.daybreak.listeners.MiscListener;
 import de.pancake.daybreak.listeners.SurvivalListener;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
@@ -131,8 +132,9 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
     /**
      * Kill a player.
      * @param p Player to kill.
+     * @param reason Reason for killing the player.
      */
-    public void kill(Player p) {
+    public void kill(Player p, Component reason) {
         if (p.isOp())
             return;
 
@@ -140,7 +142,8 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         p.setGameMode(GameMode.SPECTATOR);
         p.getInventory().clear();
         p.setExp(0.0f);
-        p.banPlayer("§cYou died. You will be unbanned at 00:00 UTC.");
+        p.kick(reason);
+        p.banPlayer("§cYou died. You will be unbanned at 0:00 UTC.");
     }
 
     // Query survivors list

@@ -128,6 +128,10 @@ public class CrownListener implements Listener {
        }
     }
 
+    /**
+     * Handle player death.
+     * @param e Player death event.
+     */
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         crownManager.transferPlayerCrown(e.getPlayer());

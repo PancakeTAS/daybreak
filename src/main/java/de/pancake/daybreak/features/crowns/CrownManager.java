@@ -5,12 +5,15 @@ import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.profile.PlayerTextures;
 import org.bukkit.scoreboard.*;
 import org.bukkit.util.Vector;
@@ -23,6 +26,8 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import static de.pancake.daybreak.DaybreakPlugin.BORDER_RADIUS;
+import static de.pancake.daybreak.DaybreakPlugin.PREFIX;
+import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 /**
  * Crown manager for the daybreak plugin.
@@ -31,6 +36,9 @@ import static de.pancake.daybreak.DaybreakPlugin.BORDER_RADIUS;
 public class CrownManager {
     /** File storing the crown holders */
     public static final Path CROWNS_FILE = Path.of("crowns.txt");
+
+    /** Crown key */
+    public static final NamespacedKey CROWN_KEY = new NamespacedKey("daybreak", "crown");
 
     /** The UUIDs of the players who currently hold the crowns. */
     public UUID goldenCrownHolder, silverCrownHolder, bronzeCrownHolder;
@@ -88,33 +96,153 @@ public class CrownManager {
                 System.out.println("created golden crown");
                 var name = "§eGolden Crown";
                 this.goldenCrown = this.spawnCrown(type, name);
-                var pos = this.goldenCrown.getLocation().toBlock();
+                var pos = this.goldenCrown.getLocation().getBlock();
                 this.goldenCrownTitle = this.titleObjective.getScore("§eGolden Crown");
                 this.goldenCrownTitle.setScore(6);
-                this.goldenCrownPos = this.titleObjective.getScore("§f » " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
+                this.goldenCrownPos = this.titleObjective.getScore("§f » " + pos.getX() + ", " + pos.getX() + ", " + pos.getX());
                 this.goldenCrownPos.setScore(5);
             }
             case IRON_BLOCK -> {
                 System.out.println("created silver crown");
                 var name = "§7Silver Crown";
                 this.silverCrown = this.spawnCrown(type, name);
-                var pos = this.silverCrown.getLocation().toBlock();
+                var pos = this.silverCrown.getLocation().getBlock();
                 this.silverCrownTitle = this.titleObjective.getScore("§7Silver Crown");
                 this.silverCrownTitle.setScore(4);
-                this.silverCrownPos = this.titleObjective.getScore("§f » " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
+                this.silverCrownPos = this.titleObjective.getScore("§f » " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
                 this.silverCrownPos.setScore(3);
             }
             default -> {
                 System.out.println("created bronze crown");
                 var name = "§6Bronze Crown";
                 this.bronzeCrown = this.spawnCrown(type, name);
-                var pos = this.bronzeCrown.getLocation().toBlock();
+                var pos = this.bronzeCrown.getLocation().getBlock();
                 this.bronzeCrownTitle = this.titleObjective.getScore("§6Bronze Crown");
                 this.bronzeCrownTitle.setScore(2);
-                this.bronzeCrownPos = this.titleObjective.getScore("§f » " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
+                this.bronzeCrownPos = this.titleObjective.getScore("§f » " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
                 this.bronzeCrownPos.setScore(1);
             }
         }
+    }
+
+    /**
+     * Create a crown at a location.
+     * @param type Material of the crown (used to see which crown it is).
+     * @param location Location of the crown.
+     */
+    public void createCrown(Material type, Location location) {
+        switch (type) {
+            case GOLD_BLOCK -> {
+                System.out.println("created golden crown");
+                var name = "§eGolden Crown";
+                this.goldenCrown = this.spawnCrown(type, name, location);
+                var pos = this.goldenCrown.getLocation().getBlock();
+                this.goldenCrownTitle = this.titleObjective.getScore("§eGolden Crown");
+                this.goldenCrownTitle.setScore(6);
+                this.goldenCrownPos = this.titleObjective.getScore("§f » " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
+                this.goldenCrownPos.setScore(5);
+            }
+            case IRON_BLOCK -> {
+                System.out.println("created silver crown");
+                var name = "§7Silver Crown";
+                this.silverCrown = this.spawnCrown(type, name, location);
+                var pos = this.silverCrown.getLocation().getBlock();
+                this.silverCrownTitle = this.titleObjective.getScore("§7Silver Crown");
+                this.silverCrownTitle.setScore(4);
+                this.silverCrownPos = this.titleObjective.getScore("§f » " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
+                this.silverCrownPos.setScore(3);
+            }
+            default -> {
+                System.out.println("created bronze crown");
+                var name = "§6Bronze Crown";
+                this.bronzeCrown = this.spawnCrown(type, name, location);
+                var pos = this.bronzeCrown.getLocation().getBlock();
+                this.bronzeCrownTitle = this.titleObjective.getScore("§6Bronze Crown");
+                this.bronzeCrownTitle.setScore(2);
+                this.bronzeCrownPos = this.titleObjective.getScore("§f » " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
+                this.bronzeCrownPos.setScore(1);
+            }
+        }
+    }
+
+    /**
+     * Transfer crown to the killer.
+     * @param p Player to transfer crown from.
+     */
+    @SneakyThrows
+    public void transferPlayerCrown(Player p) {
+
+        UUID goldenCrownHolder = null;
+        UUID silverCrownHolder = null;
+        UUID bronzeCrownHolder = null;
+
+        if (Files.exists(CROWNS_FILE)) {
+            var crownHolders = Files.readAllLines(CROWNS_FILE);
+            goldenCrownHolder = crownHolders.get(0).equals("null") ? null : UUID.fromString(crownHolders.get(0));
+            silverCrownHolder = crownHolders.get(1).equals("null") ? null : UUID.fromString(crownHolders.get(1));
+            bronzeCrownHolder = crownHolders.get(2).equals("null") ? null : UUID.fromString(crownHolders.get(2));
+        }
+        var sourcePdc = p.getPersistentDataContainer();
+        int crown = sourcePdc.getOrDefault(CROWN_KEY, PersistentDataType.INTEGER, 0);
+        if (crown == 0)
+            return;
+
+        var killer = p.getKiller();
+        if (killer == null) {
+            sourcePdc.set(CROWN_KEY, PersistentDataType.INTEGER, 0);
+            if (crown == 3) {
+                goldenCrownHolder = null;
+                this.createCrown(Material.GOLD_BLOCK, p.getLocation());
+            }
+            if (crown == 2) {
+                silverCrownHolder = null;
+                this.createCrown(Material.IRON_BLOCK, p.getLocation());
+            }
+            if (crown == 1) {
+                bronzeCrownHolder = null;
+                this.createCrown(Material.COPPER_BLOCK, p.getLocation());
+            }
+        } else {
+            var targetPdc = killer.getPersistentDataContainer();
+
+            // get crown of killer
+            int killerCrown = targetPdc.getOrDefault(CROWN_KEY, PersistentDataType.INTEGER, 0);
+            if (killerCrown >= crown)
+                return;
+
+            // transfer crown
+            targetPdc.set(CROWN_KEY, PersistentDataType.INTEGER, crown);
+            sourcePdc.set(CROWN_KEY, PersistentDataType.INTEGER, 0);
+
+            if (killerCrown == 2) {
+                this.createCrown(Material.IRON_BLOCK);
+                silverCrownHolder = null;
+            }
+            if (killerCrown == 1) {
+                this.createCrown(Material.COPPER_BLOCK);
+                bronzeCrownHolder = null;
+            }
+
+            // send message to killer
+            if (crown == 3) {
+                goldenCrownHolder = killer.getUniqueId();
+                killer.sendMessage(miniMessage().deserialize("<prefix>You stole the <yellow>Golden Crown</yellow> from <gold>" + p.getName() + "</gold>.", PREFIX));
+            }
+            if (crown == 2) {
+                silverCrownHolder = killer.getUniqueId();
+                killer.sendMessage(miniMessage().deserialize("<prefix>You stole the <gray>Silver Crown</gray> from <gold>" + p.getName() + "</gold>.", PREFIX));
+            }
+            if (crown == 1) {
+                bronzeCrownHolder = killer.getUniqueId();
+                killer.sendMessage(miniMessage().deserialize("<prefix>You stole the <gold>Bronze Crown</gold> from <gold>" + p.getName() + "</gold>.", PREFIX));
+            }
+        }
+
+        Files.write(CROWNS_FILE,
+                ((goldenCrownHolder == null ? "null" : goldenCrownHolder.toString()) + "\n" +
+                        (silverCrownHolder == null ? "null" : silverCrownHolder.toString()) + "\n" +
+                        (bronzeCrownHolder == null ? "null" : bronzeCrownHolder.toString())).getBytes()
+        );
     }
 
     /**
@@ -136,6 +264,46 @@ public class CrownManager {
 
         // spawn crown
         var crown = (Item) world.spawnEntity(world.getBlockAt(x, y, z).getLocation(), EntityType.DROPPED_ITEM);
+
+        // create itemstack and meta
+        var itemStack = new ItemStack(Material.PLAYER_HEAD);
+        var skullMeta = (SkullMeta) itemStack.getItemMeta();
+
+        // load texture depending on the material type
+        if (type.equals(Material.GOLD_BLOCK)) {
+            addSkullTexture(skullMeta, "http://textures.minecraft.net/texture/a645fb0017617de2320bcf9fe2b21c5bc55f5c027060cab7edb929aa1d442327");
+        } else if (type.equals(Material.IRON_BLOCK)) {
+            addSkullTexture(skullMeta, "http://textures.minecraft.net/texture/fae9e7e3a4e9c656124fd50acb9b685ef5a5c0b61c8abeb98e570252c9a1dd7");
+        } else {
+            addSkullTexture(skullMeta, "http://textures.minecraft.net/texture/9fa86b629ff2b5839aaa3444f044d4de1dfa13d1333a10c7ceaf93726fbc549d");
+        }
+        itemStack.setItemMeta(skullMeta);
+        crown.setItemStack(itemStack);
+        crown.customName(Component.text(name));
+        crown.setCustomNameVisible(true);
+        crown.setInvulnerable(true);
+        crown.setGravity(false);
+        crown.setPersistent(true);
+        crown.setTicksLived(Integer.MAX_VALUE);
+
+        // stop the crown from floating away
+        crown.setVelocity(new Vector(0, 0, 0));
+
+        return crown;
+    }
+
+    /**
+     * Spawn a crown entity.
+     * @param type Material of the crown.
+     * @param name Name of the crown.
+     * @param location Location of the crown.
+     * @return The spawned crown entity.
+     */
+    public Item spawnCrown(Material type, String name, Location location) {
+        var world = Bukkit.getWorlds().getFirst();
+
+        // spawn crown
+        var crown = (Item) world.spawnEntity(location, EntityType.DROPPED_ITEM);
 
         // create itemstack and meta
         var itemStack = new ItemStack(Material.PLAYER_HEAD);

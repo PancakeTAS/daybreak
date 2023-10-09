@@ -9,13 +9,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.nio.file.Files;
 
-import static de.pancake.daybreak.DaybreakPlugin.CROWN_KEY;
 import static de.pancake.daybreak.DaybreakPlugin.PREFIX;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
@@ -61,15 +61,14 @@ public class CrownListener implements Listener {
             var playerPdc = p.getPersistentDataContainer();
 
             // get crown of player
-            int crown = playerPdc.getOrDefault(CROWN_KEY, PersistentDataType.INTEGER, 0);
+            int crown = playerPdc.getOrDefault(CrownManager.CROWN_KEY, PersistentDataType.INTEGER, 0);
             if ((crown == 3 || (crown == 2 && itemStack.equals(bronzeCrownStack)))) return;
-            if (crownManager.goldenCrownHolder.equals(uuid)
+            if (crownManager.goldenCrownHolder != null && crownManager.silverCrownHolder != null && crownManager.bronzeCrownHolder != null
+                    && (crownManager.goldenCrownHolder.equals(uuid)
                     || (crownManager.silverCrownHolder.equals(uuid) && itemStack.equals(silverCrownStack))
                     || (crownManager.silverCrownHolder.equals(uuid) && itemStack.equals(bronzeCrownStack))
-                    || (crownManager.bronzeCrownHolder.equals(uuid) && itemStack.equals(bronzeCrownStack)))
+                    || (crownManager.bronzeCrownHolder.equals(uuid) && itemStack.equals(bronzeCrownStack))))
                 return;
-
-
 
             // pick up the crown
             if (itemStack.equals(goldenCrownStack)) {
@@ -85,7 +84,7 @@ public class CrownListener implements Listener {
                     crownManager.silverCrownHolder = null;
                     crownManager.createCrown(Material.IRON_BLOCK);
                 }
-                playerPdc.set(CROWN_KEY, PersistentDataType.INTEGER, 3);
+                playerPdc.set(CrownManager.CROWN_KEY, PersistentDataType.INTEGER, 3);
                 Bukkit.broadcast(miniMessage().deserialize("<prefix><yellow>" + p.getName() + " has picked up the golden crown!</yellow>", PREFIX));
             } else if (itemStack.equals(silverCrownStack)) {
                 crownManager.silverCrown = null;
@@ -96,14 +95,14 @@ public class CrownListener implements Listener {
                     crownManager.bronzeCrownHolder = null;
                     crownManager.createCrown(Material.COPPER_BLOCK);
                 }
-                playerPdc.set(CROWN_KEY, PersistentDataType.INTEGER, 2);
+                playerPdc.set(CrownManager.CROWN_KEY, PersistentDataType.INTEGER, 2);
                 Bukkit.broadcast(miniMessage().deserialize("<prefix><gray>" + p.getName() + " has picked up the silver crown!</gray>", PREFIX));
             } else if (itemStack.equals(bronzeCrownStack)) {
                 crownManager.bronzeCrown = null;
                 crownManager.bronzeCrownTitle.resetScore();
                 crownManager.bronzeCrownPos.resetScore();
                 crownManager.bronzeCrownHolder = uuid;
-                playerPdc.set(CROWN_KEY, PersistentDataType.INTEGER, 1);
+                playerPdc.set(CrownManager.CROWN_KEY, PersistentDataType.INTEGER, 1);
                 Bukkit.broadcast(miniMessage().deserialize("<prefix><gold>" + p.getName() + " has picked up the bronze crown!</gold>", PREFIX));
             }
 
@@ -127,6 +126,11 @@ public class CrownListener implements Listener {
            if (item.getItemStack().equals(crownManager.bronzeCrown.getItemStack()) || item.getItemStack().equals(crownManager.silverCrown.getItemStack()) || item.getItemStack().equals(crownManager.goldenCrown.getItemStack()))
                e.setCancelled(true);
        }
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        crownManager.transferPlayerCrown(e.getPlayer());
     }
 
     /**

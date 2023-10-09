@@ -13,14 +13,10 @@ import de.pancake.daybreak.webhook.WebhookExecutor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.NamespacedKey;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,8 +47,6 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
     public static final HeadCollectionDataType HEADS_TYPE = new HeadCollectionDataType();
     /** Head collection key */
     public static final NamespacedKey HEADS_KEY = new NamespacedKey("daybreak", "heads");
-    /** Crown key */
-    public static final NamespacedKey CROWN_KEY = new NamespacedKey("daybreak", "crown");
     /** Prefix for messages */
     public final static TagResolver.Single PREFIX = parsed("prefix", "<gold>»</gold> <red>");
 
@@ -161,20 +155,18 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
      * @param p Player to kill.
      */
     public void kill(Player p) {
-        if (p.isOp())
-            return;
-
         // add head to killer
         this.addPlayerHead(p);
-
-        // update crown of players
-        this.addPlayerCrown(p);
 
         // remove player
         this.removeSurvivor(p.getUniqueId());
         p.setGameMode(GameMode.SPECTATOR);
         p.getInventory().clear();
         p.setExp(0.0f);
+
+        // stop ops from being banned
+        if (p.isOp())
+            return;
         p.banPlayer("§cYou died. You will be unbanned at 00:00 UTC.");
     }
 
@@ -197,36 +189,6 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         // send message to killer
         var total = data.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
         killer.sendMessage(miniMessage().deserialize("<prefix>You have collected the head of <gold>" + p.getName() + "</gold>. You now have <gold>" + total + "</gold> head" + (total == 1 ? "" : "s") + ".", PREFIX));
-    }
-
-    /**
-     * Transfer crown to the killer.
-     * @param p Player to transfer crown from.
-     */
-    private void addPlayerCrown(Player p) {
-        var killer = p.getKiller();
-        if (killer == null)
-            return;
-
-        var sourcePdc = p.getPersistentDataContainer();
-        var targetPdc = killer.getPersistentDataContainer();
-
-        // get crown of player
-        var crown = sourcePdc.getOrDefault(CROWN_KEY, PersistentDataType.INTEGER, 0);
-        if (crown == 0)
-            return;
-
-        // get crown of killer
-        var killerCrown = targetPdc.getOrDefault(CROWN_KEY, PersistentDataType.INTEGER, 0);
-        if (killerCrown >= crown)
-            return;
-
-        // transfer crown
-        targetPdc.set(CROWN_KEY, PersistentDataType.INTEGER, crown);
-        sourcePdc.set(CROWN_KEY, PersistentDataType.INTEGER, killerCrown);
-
-        // send message to killer
-        killer.sendMessage(miniMessage().deserialize("<prefix>You stole the <gold>Golden Crown</gold> from <gold>" + p.getName() + "</gold>.", PREFIX));
     }
 
     // Query survivors list

@@ -52,7 +52,6 @@ public class CrownListener implements Listener {
             return;
         }
         e.setCancelled(true);
-        System.out.println("Cancelled event");
         if (e.getEntity() instanceof Player p) {
             var uuid = p.getUniqueId();
 
@@ -68,6 +67,10 @@ public class CrownListener implements Listener {
                 crownManager.goldenCrownTitle.resetScore();
                 crownManager.goldenCrownPos.resetScore();
                 crownManager.goldenCrownHolder = uuid;
+                if (crownManager.bronzeCrownHolder == uuid)
+                    crownManager.bronzeCrownHolder = null;
+                if (crownManager.silverCrownHolder == uuid)
+                    crownManager.silverCrownHolder = null;
                 playerPdc.set(CROWN_KEY, PersistentDataType.INTEGER, 3);
                 Bukkit.broadcast(miniMessage().deserialize("<prefix><yellow>" + p.getName() + " has picked up the golden crown!</yellow>", PREFIX));
             } else if (itemStack.equals(silverCrownStack)) {
@@ -75,6 +78,8 @@ public class CrownListener implements Listener {
                 crownManager.silverCrownTitle.resetScore();
                 crownManager.silverCrownPos.resetScore();
                 crownManager.silverCrownHolder = uuid;
+                if (crownManager.bronzeCrownHolder == uuid)
+                    crownManager.bronzeCrownHolder = null;
                 playerPdc.set(CROWN_KEY, PersistentDataType.INTEGER, 2);
                 Bukkit.broadcast(miniMessage().deserialize("<prefix><gray>" + p.getName() + " has picked up the silver crown!</gray>", PREFIX));
             } else if (itemStack.equals(bronzeCrownStack)) {

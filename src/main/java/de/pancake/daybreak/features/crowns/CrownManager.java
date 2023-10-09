@@ -36,7 +36,7 @@ public class CrownManager {
     public UUID goldenCrownHolder, silverCrownHolder, bronzeCrownHolder;
 
     /** Entities of the crowns if no player holds them. */
-    public Entity goldenCrown, silverCrown, bronzeCrown;
+    public Item goldenCrown, silverCrown, bronzeCrown;
 
     /** Scoreboard displaying crowns information */
     public Scoreboard crownScoreboard;
@@ -108,7 +108,7 @@ public class CrownManager {
      * @param name Name of the crown.
      * @return The spawned crown entity.
      */
-    public Entity spawnCrown(Material type, String name) {
+    public Item spawnCrown(Material type, String name) {
         var world = Bukkit.getWorlds().getFirst();
 
         // get random position within border

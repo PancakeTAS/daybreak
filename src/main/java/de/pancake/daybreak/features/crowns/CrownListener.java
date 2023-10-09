@@ -42,14 +42,13 @@ public class CrownListener implements Listener {
     public void onPickup(EntityPickupItemEvent e) {
         // check if the item is a crown
         var item = e.getItem();
-        System.out.println(item);
-        System.out.println(crownManager.goldenCrown);
-        System.out.println(crownManager.silverCrown);
-        System.out.println(crownManager.bronzeCrown);
-        System.out.println(item.equals(crownManager.goldenCrown));
-        System.out.println(item.equals(crownManager.silverCrown));
-        System.out.println(item.equals(crownManager.bronzeCrown));
-        if (!item.equals(crownManager.goldenCrown) && !item.equals(crownManager.silverCrown) && !item.equals(crownManager.bronzeCrown)) {
+        var itemStack = e.getItem().getItemStack();
+
+        var goldenCrownStack = crownManager.goldenCrown == null ? null : crownManager.goldenCrown.getItemStack();
+        var silverCrownStack = crownManager.silverCrown == null ? null : crownManager.silverCrown.getItemStack();
+        var bronzeCrownStack = crownManager.bronzeCrown == null ? null : crownManager.bronzeCrown.getItemStack();
+
+        if (!itemStack.equals(goldenCrownStack) && !itemStack.equals(silverCrownStack) && !itemStack.equals(bronzeCrownStack)) {
             return;
         }
         e.setCancelled(true);
@@ -61,24 +60,24 @@ public class CrownListener implements Listener {
 
             // get crown of player
             int crown = playerPdc.getOrDefault(CROWN_KEY, PersistentDataType.INTEGER, 0);
-            if ((crown == 3 || (crown == 2 && item.equals(crownManager.bronzeCrown)))) return;
+            if ((crown == 3 || (crown == 2 && itemStack.equals(bronzeCrownStack)))) return;
 
             // pick up the crown
-            if (item.equals(crownManager.goldenCrown)) {
+            if (itemStack.equals(goldenCrownStack)) {
                 crownManager.goldenCrown = null;
                 crownManager.goldenCrownTitle.resetScore();
                 crownManager.goldenCrownPos.resetScore();
                 crownManager.goldenCrownHolder = uuid;
                 playerPdc.set(CROWN_KEY, PersistentDataType.INTEGER, 3);
                 Bukkit.broadcast(miniMessage().deserialize("<prefix><yellow>" + p.getName() + " has picked up the golden crown!</yellow>", PREFIX));
-            } else if (item.equals(crownManager.silverCrown)) {
+            } else if (itemStack.equals(silverCrownStack)) {
                 crownManager.silverCrown = null;
                 crownManager.silverCrownTitle.resetScore();
                 crownManager.silverCrownPos.resetScore();
                 crownManager.silverCrownHolder = uuid;
                 playerPdc.set(CROWN_KEY, PersistentDataType.INTEGER, 2);
                 Bukkit.broadcast(miniMessage().deserialize("<prefix><gray>" + p.getName() + " has picked up the silver crown!</gray>", PREFIX));
-            } else if (item.equals(crownManager.bronzeCrown)) {
+            } else if (itemStack.equals(bronzeCrownStack)) {
                 crownManager.bronzeCrown = null;
                 crownManager.bronzeCrownTitle.resetScore();
                 crownManager.bronzeCrownPos.resetScore();

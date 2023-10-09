@@ -172,16 +172,6 @@ public class CrownManager {
     @SneakyThrows
     public void transferPlayerCrown(Player p) {
 
-        UUID goldenCrownHolder = null;
-        UUID silverCrownHolder = null;
-        UUID bronzeCrownHolder = null;
-
-        if (Files.exists(CROWNS_FILE)) {
-            var crownHolders = Files.readAllLines(CROWNS_FILE);
-            goldenCrownHolder = crownHolders.get(0).equals("null") ? null : UUID.fromString(crownHolders.get(0));
-            silverCrownHolder = crownHolders.get(1).equals("null") ? null : UUID.fromString(crownHolders.get(1));
-            bronzeCrownHolder = crownHolders.get(2).equals("null") ? null : UUID.fromString(crownHolders.get(2));
-        }
         var sourcePdc = p.getPersistentDataContainer();
         int crown = sourcePdc.getOrDefault(CROWN_KEY, PersistentDataType.INTEGER, 0);
         if (crown == 0)
@@ -191,15 +181,15 @@ public class CrownManager {
         if (killer == null) {
             sourcePdc.set(CROWN_KEY, PersistentDataType.INTEGER, 0);
             if (crown == 3) {
-                goldenCrownHolder = null;
+                this.goldenCrownHolder = null;
                 this.createCrown(Material.GOLD_BLOCK, p.getLocation());
             }
             if (crown == 2) {
-                silverCrownHolder = null;
+                this.silverCrownHolder = null;
                 this.createCrown(Material.IRON_BLOCK, p.getLocation());
             }
             if (crown == 1) {
-                bronzeCrownHolder = null;
+                this.bronzeCrownHolder = null;
                 this.createCrown(Material.COPPER_BLOCK, p.getLocation());
             }
         } else {
@@ -216,32 +206,32 @@ public class CrownManager {
 
             if (killerCrown == 2) {
                 this.createCrown(Material.IRON_BLOCK);
-                silverCrownHolder = null;
+                this.silverCrownHolder = null;
             }
             if (killerCrown == 1) {
                 this.createCrown(Material.COPPER_BLOCK);
-                bronzeCrownHolder = null;
+                this.bronzeCrownHolder = null;
             }
 
             // send message to killer
             if (crown == 3) {
-                goldenCrownHolder = killer.getUniqueId();
+                this.goldenCrownHolder = killer.getUniqueId();
                 killer.sendMessage(miniMessage().deserialize("<prefix>You stole the <yellow>Golden Crown</yellow> from <gold>" + p.getName() + "</gold>.", PREFIX));
             }
             if (crown == 2) {
-                silverCrownHolder = killer.getUniqueId();
+                this.silverCrownHolder = killer.getUniqueId();
                 killer.sendMessage(miniMessage().deserialize("<prefix>You stole the <gray>Silver Crown</gray> from <gold>" + p.getName() + "</gold>.", PREFIX));
             }
             if (crown == 1) {
-                bronzeCrownHolder = killer.getUniqueId();
+                this.bronzeCrownHolder = killer.getUniqueId();
                 killer.sendMessage(miniMessage().deserialize("<prefix>You stole the <gold>Bronze Crown</gold> from <gold>" + p.getName() + "</gold>.", PREFIX));
             }
         }
 
         Files.write(CROWNS_FILE,
-                ((goldenCrownHolder == null ? "null" : goldenCrownHolder.toString()) + "\n" +
-                        (silverCrownHolder == null ? "null" : silverCrownHolder.toString()) + "\n" +
-                        (bronzeCrownHolder == null ? "null" : bronzeCrownHolder.toString())).getBytes()
+                ((this.goldenCrownHolder == null ? "null" : this.goldenCrownHolder.toString()) + "\n" +
+                        (this.silverCrownHolder == null ? "null" : this.silverCrownHolder.toString()) + "\n" +
+                        (this.bronzeCrownHolder == null ? "null" : this.bronzeCrownHolder.toString())).getBytes()
         );
     }
 
@@ -337,7 +327,6 @@ public class CrownManager {
      * @param meta Skull's Meta
      * @param url Minecraft Texture URL
      */
-
     private void addSkullTexture(SkullMeta meta, String url) {
         PlayerProfile playerProfile = Bukkit.createProfile(UUID.randomUUID());
         PlayerTextures playerTextures = playerProfile.getTextures();

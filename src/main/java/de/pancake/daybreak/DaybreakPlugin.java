@@ -3,6 +3,7 @@ package de.pancake.daybreak;
 import de.pancake.daybreak.commands.DaybreakCommand;
 import de.pancake.daybreak.commands.DisconnectCommand;
 import de.pancake.daybreak.commands.HeadsCommand;
+import de.pancake.daybreak.commands.LeaderboardCommand;
 import de.pancake.daybreak.features.crowns.CrownListener;
 import de.pancake.daybreak.generators.VanillaGenerator;
 import de.pancake.daybreak.listeners.CombatListener;
@@ -70,6 +71,7 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         Bukkit.getCommandMap().register("daybreak", "db", new DaybreakCommand(this));
         Bukkit.getCommandMap().register("headcollection", "heads", new HeadsCommand());
         Bukkit.getCommandMap().register("disconnect", "dc", new DisconnectCommand(this));
+        Bukkit.getCommandMap().register("leaderboard", "lb", new LeaderboardCommand());
 
         // register listeners
         Bukkit.getPluginManager().registerEvents(new SurvivalListener(this), this);

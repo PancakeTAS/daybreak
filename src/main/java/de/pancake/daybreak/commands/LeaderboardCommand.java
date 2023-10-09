@@ -52,16 +52,16 @@ public class LeaderboardCommand extends Command {
             }
 
             // convert their uuid's to a name or "NO ONE"
-            var goldenCrownOwnerName = goldenCrownHolder == null ? "NO ONE" : Bukkit.getOfflinePlayer(goldenCrownHolder).getName();
-            var silverCrownOwnerName = silverCrownHolder == null ? "NO ONE" : Bukkit.getOfflinePlayer(silverCrownHolder).getName();
-            var bronzeCrownOwnerName = bronzeCrownHolder == null ? "NO ONE" : Bukkit.getOfflinePlayer(bronzeCrownHolder).getName();
+            var goldenCrownOwnerName = goldenCrownHolder == null ? "No one" : Bukkit.getOfflinePlayer(goldenCrownHolder).getName();
+            var silverCrownOwnerName = silverCrownHolder == null ? "No one" : Bukkit.getOfflinePlayer(silverCrownHolder).getName();
+            var bronzeCrownOwnerName = bronzeCrownHolder == null ? "No one" : Bukkit.getOfflinePlayer(bronzeCrownHolder).getName();
 
             p.sendMessage(miniMessage().deserialize("""
                 <prefix><bold>Daybreak</bold>
-                <prefix>Current Crown Holders
-                <prefix><yellow>Golden Crown</yellow>: <gold>%s</gold>.
-                <prefix><gray>Silver Crown</gray>: <gold>%s</gold>.
-                <prefix><gold>Bronze Crown</gold>: <gold>%s</gold>.""".formatted(goldenCrownOwnerName, silverCrownOwnerName, bronzeCrownOwnerName), PREFIX)
+                <prefix>Current Leaderboard
+                <prefix><yellow>1st</yellow>: <gold>%s</gold>.
+                <prefix><gray>2nd</gray>: <gold>%s</gold>.
+                <prefix><gold>3rd</gold>: <gold>%s</gold>.""".formatted(goldenCrownOwnerName, silverCrownOwnerName, bronzeCrownOwnerName), PREFIX)
             );
         }
 

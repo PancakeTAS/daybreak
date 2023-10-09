@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -132,7 +133,7 @@ public class CrownListener implements Listener {
      * Handle player death.
      * @param e Player death event.
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST) // send as late as possible, so we can still show the crowns lost in the webhook
     public void onPlayerDeath(PlayerDeathEvent e) {
         crownManager.transferPlayerCrown(e.getPlayer());
     }
@@ -147,5 +148,13 @@ public class CrownListener implements Listener {
         if (!e.getPlayer().getScoreboard().equals(crownManager.crownScoreboard))
             e.getPlayer().setScoreboard(crownManager.crownScoreboard);
 
+        if (crownManager.goldenCrownHolder != null && crownManager.goldenCrownHolder.equals(e.getPlayer().getUniqueId()))
+            e.getPlayer().getPersistentDataContainer().set(CrownManager.CROWN_KEY, PersistentDataType.INTEGER, 3);
+
+        if (crownManager.silverCrownHolder != null && crownManager.silverCrownHolder.equals(e.getPlayer().getUniqueId()))
+            e.getPlayer().getPersistentDataContainer().set(CrownManager.CROWN_KEY, PersistentDataType.INTEGER, 2);
+
+        if (crownManager.bronzeCrownHolder != null && crownManager.bronzeCrownHolder.equals(e.getPlayer().getUniqueId()))
+            e.getPlayer().getPersistentDataContainer().set(CrownManager.CROWN_KEY, PersistentDataType.INTEGER, 1);
     }
 }

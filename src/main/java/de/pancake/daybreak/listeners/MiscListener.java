@@ -2,6 +2,7 @@ package de.pancake.daybreak.listeners;
 
 import de.pancake.daybreak.DaybreakPlugin;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import lombok.SneakyThrows;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -16,7 +17,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 
+import java.nio.file.Files;
+import java.util.UUID;
+
 import static de.pancake.daybreak.DaybreakPlugin.PREFIX;
+import static de.pancake.daybreak.features.crowns.CrownManager.CROWNS_FILE;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 import static net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.*;
 import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection;
@@ -97,7 +102,7 @@ public class MiscListener implements Listener {
      * Handle player death event.
      * @param e Player death event.
      */
-    @EventHandler(priority = EventPriority.HIGH) // run after other event handlers
+    @EventHandler(priority = EventPriority.HIGH) @SneakyThrows // run after other event handlers
     public void onPlayerDeath(PlayerDeathEvent e) {
         var p = e.getPlayer();
         var killer = p.getKiller();
@@ -112,7 +117,20 @@ public class MiscListener implements Listener {
             msg = "<gold>" + p.getName() + "</gold> <red>logged out during combat!";
 
         e.deathMessage(miniMessage().deserialize("<prefix><msg>", PREFIX, parsed("msg", msg)));
-        this.plugin.webhookExecutor.sendDeathMessage(p, killer, omsg);
+
+        // grab crown holders
+        UUID goldenCrownHolder = null;
+        UUID silverCrownHolder = null;
+        UUID bronzeCrownHolder = null;
+
+        if (Files.exists(CROWNS_FILE)) {
+            var crownHolders = Files.readAllLines(CROWNS_FILE);
+            goldenCrownHolder = crownHolders.get(0).equals("null") ? null : UUID.fromString(crownHolders.get(0));
+            silverCrownHolder = crownHolders.get(1).equals("null") ? null : UUID.fromString(crownHolders.get(1));
+            bronzeCrownHolder = crownHolders.get(2).equals("null") ? null : UUID.fromString(crownHolders.get(2));
+        }
+
+        this.plugin.webhookExecutor.sendDeathMessage(p, killer, omsg, goldenCrownHolder, silverCrownHolder, bronzeCrownHolder);
     }
 
 }

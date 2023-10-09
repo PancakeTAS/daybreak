@@ -93,17 +93,15 @@ public class CrownManager {
     public void createCrown(Material type) {
         switch (type) {
             case GOLD_BLOCK -> {
-                System.out.println("created golden crown");
                 var name = "§eGolden Crown";
                 this.goldenCrown = this.spawnCrown(type, name);
                 var pos = this.goldenCrown.getLocation().getBlock();
                 this.goldenCrownTitle = this.titleObjective.getScore("§eGolden Crown");
                 this.goldenCrownTitle.setScore(6);
-                this.goldenCrownPos = this.titleObjective.getScore("§f » " + pos.getX() + ", " + pos.getX() + ", " + pos.getX());
+                this.goldenCrownPos = this.titleObjective.getScore("§f » " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
                 this.goldenCrownPos.setScore(5);
             }
             case IRON_BLOCK -> {
-                System.out.println("created silver crown");
                 var name = "§7Silver Crown";
                 this.silverCrown = this.spawnCrown(type, name);
                 var pos = this.silverCrown.getLocation().getBlock();
@@ -113,7 +111,6 @@ public class CrownManager {
                 this.silverCrownPos.setScore(3);
             }
             default -> {
-                System.out.println("created bronze crown");
                 var name = "§6Bronze Crown";
                 this.bronzeCrown = this.spawnCrown(type, name);
                 var pos = this.bronzeCrown.getLocation().getBlock();
@@ -133,7 +130,6 @@ public class CrownManager {
     public void createCrown(Material type, Location location) {
         switch (type) {
             case GOLD_BLOCK -> {
-                System.out.println("created golden crown");
                 var name = "§eGolden Crown";
                 this.goldenCrown = this.spawnCrown(type, name, location);
                 var pos = this.goldenCrown.getLocation().getBlock();
@@ -143,7 +139,6 @@ public class CrownManager {
                 this.goldenCrownPos.setScore(5);
             }
             case IRON_BLOCK -> {
-                System.out.println("created silver crown");
                 var name = "§7Silver Crown";
                 this.silverCrown = this.spawnCrown(type, name, location);
                 var pos = this.silverCrown.getLocation().getBlock();
@@ -153,7 +148,6 @@ public class CrownManager {
                 this.silverCrownPos.setScore(3);
             }
             default -> {
-                System.out.println("created bronze crown");
                 var name = "§6Bronze Crown";
                 this.bronzeCrown = this.spawnCrown(type, name, location);
                 var pos = this.bronzeCrown.getLocation().getBlock();

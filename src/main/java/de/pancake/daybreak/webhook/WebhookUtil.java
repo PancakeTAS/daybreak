@@ -17,7 +17,7 @@ import java.net.http.HttpResponse;
 public class WebhookUtil {
 
     /** The URL of the webhook. */
-    private static final URI WEBHOOK_URL = URI.create("https://discord.com/api/webhooks/1160644389891215442/aOIj_RchdMhw5cKSOzGhmbnRQL_9qeezwQtRbQ-85e9iGRe-nHgYsoXLs7JCAxG-du4H"); //System.getenv("DAYBREAK_WEBHOOK")
+    private static final URI WEBHOOK_URL = URI.create(System.getenv("DAYBREAK_WEBHOOK")); // definitely didnt leak a test (now deleted) webhook url lol - Cosmic
 
     /** The GSON instance used to serialize the webhook message. */
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();

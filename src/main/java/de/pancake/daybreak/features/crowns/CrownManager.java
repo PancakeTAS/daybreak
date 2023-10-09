@@ -68,37 +68,52 @@ public class CrownManager {
         }
 
         // spawn crowns if no player holds them
-        if (this.goldenCrownHolder == null) {
-            System.out.println("created golden crown");
-            var name = "§eGolden Crown";
-            this.goldenCrown = this.spawnCrown(Material.GOLD_BLOCK, name);
-            var pos = this.goldenCrown.getLocation().toBlock();
-            this.goldenCrownTitle = this.titleObjective.getScore("§eGolden Crown");
-            this.goldenCrownTitle.setScore(6);
-            this.goldenCrownPos = this.titleObjective.getScore("§f » " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
-            this.goldenCrownPos.setScore(5);
-        }
+        if (this.goldenCrownHolder == null)
+            createCrown(Material.GOLD_BLOCK);
 
-        if (this.silverCrownHolder == null) {
-            System.out.println("created silver crown");
-            var name = "§7Silver Crown";
-            this.silverCrown = this.spawnCrown(Material.IRON_BLOCK, name);
-            var pos = this.silverCrown.getLocation().toBlock();
-            this.silverCrownTitle = this.titleObjective.getScore("§7Silver Crown");
-            this.silverCrownTitle.setScore(4);
-            this.silverCrownPos = this.titleObjective.getScore("§f » " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
-            this.silverCrownPos.setScore(3);
-        }
+        if (this.silverCrownHolder == null)
+            createCrown(Material.IRON_BLOCK);
 
-        if (this.bronzeCrownHolder == null) {
-            System.out.println("created bronze crown");
-            var name = "§6Bronze Crown";
-            this.bronzeCrown = this.spawnCrown(Material.COPPER_BLOCK, name);
-            var pos = this.bronzeCrown.getLocation().toBlock();
-            this.bronzeCrownTitle = this.titleObjective.getScore("§6Bronze Crown");
-            this.bronzeCrownTitle.setScore(2);
-            this.bronzeCrownPos = this.titleObjective.getScore("§f » " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
-            this.bronzeCrownPos.setScore(1);
+        if (this.bronzeCrownHolder == null)
+            createCrown(Material.COPPER_BLOCK);
+    }
+
+    /**
+     * Create a crown.
+     * @param type Material of the crown (used to see which crown it is).
+     */
+    public void createCrown(Material type) {
+        switch (type) {
+            case GOLD_BLOCK -> {
+                System.out.println("created golden crown");
+                var name = "§eGolden Crown";
+                this.goldenCrown = this.spawnCrown(type, name);
+                var pos = this.goldenCrown.getLocation().toBlock();
+                this.goldenCrownTitle = this.titleObjective.getScore("§eGolden Crown");
+                this.goldenCrownTitle.setScore(6);
+                this.goldenCrownPos = this.titleObjective.getScore("§f » " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
+                this.goldenCrownPos.setScore(5);
+            }
+            case IRON_BLOCK -> {
+                System.out.println("created silver crown");
+                var name = "§7Silver Crown";
+                this.silverCrown = this.spawnCrown(type, name);
+                var pos = this.silverCrown.getLocation().toBlock();
+                this.silverCrownTitle = this.titleObjective.getScore("§7Silver Crown");
+                this.silverCrownTitle.setScore(4);
+                this.silverCrownPos = this.titleObjective.getScore("§f » " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
+                this.silverCrownPos.setScore(3);
+            }
+            default -> {
+                System.out.println("created bronze crown");
+                var name = "§6Bronze Crown";
+                this.bronzeCrown = this.spawnCrown(type, name);
+                var pos = this.bronzeCrown.getLocation().toBlock();
+                this.bronzeCrownTitle = this.titleObjective.getScore("§6Bronze Crown");
+                this.bronzeCrownTitle.setScore(2);
+                this.bronzeCrownPos = this.titleObjective.getScore("§f » " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
+                this.bronzeCrownPos.setScore(1);
+            }
         }
     }
 

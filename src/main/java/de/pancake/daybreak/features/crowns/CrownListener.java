@@ -1,7 +1,10 @@
 package de.pancake.daybreak.features.crowns;
 
+import io.papermc.paper.event.entity.EntityMoveEvent;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -60,6 +63,13 @@ public class CrownListener implements Listener {
             // get crown of player
             int crown = playerPdc.getOrDefault(CROWN_KEY, PersistentDataType.INTEGER, 0);
             if ((crown == 3 || (crown == 2 && itemStack.equals(bronzeCrownStack)))) return;
+            if (crownManager.goldenCrownHolder.equals(uuid)
+                    || (crownManager.silverCrownHolder.equals(uuid) && itemStack.equals(silverCrownStack))
+                    || (crownManager.silverCrownHolder.equals(uuid) && itemStack.equals(bronzeCrownStack))
+                    || (crownManager.bronzeCrownHolder.equals(uuid) && itemStack.equals(bronzeCrownStack)))
+                return;
+
+
 
             // pick up the crown
             if (itemStack.equals(goldenCrownStack)) {
@@ -67,10 +77,14 @@ public class CrownListener implements Listener {
                 crownManager.goldenCrownTitle.resetScore();
                 crownManager.goldenCrownPos.resetScore();
                 crownManager.goldenCrownHolder = uuid;
-                if (crownManager.bronzeCrownHolder == uuid)
+                if (crownManager.bronzeCrownHolder == uuid) {
                     crownManager.bronzeCrownHolder = null;
-                if (crownManager.silverCrownHolder == uuid)
+                    crownManager.createCrown(Material.COPPER_BLOCK);
+                }
+                if (crownManager.silverCrownHolder == uuid) {
                     crownManager.silverCrownHolder = null;
+                    crownManager.createCrown(Material.IRON_BLOCK);
+                }
                 playerPdc.set(CROWN_KEY, PersistentDataType.INTEGER, 3);
                 Bukkit.broadcast(miniMessage().deserialize("<prefix><yellow>" + p.getName() + " has picked up the golden crown!</yellow>", PREFIX));
             } else if (itemStack.equals(silverCrownStack)) {
@@ -78,8 +92,10 @@ public class CrownListener implements Listener {
                 crownManager.silverCrownTitle.resetScore();
                 crownManager.silverCrownPos.resetScore();
                 crownManager.silverCrownHolder = uuid;
-                if (crownManager.bronzeCrownHolder == uuid)
+                if (crownManager.bronzeCrownHolder == uuid) {
                     crownManager.bronzeCrownHolder = null;
+                    crownManager.createCrown(Material.COPPER_BLOCK);
+                }
                 playerPdc.set(CROWN_KEY, PersistentDataType.INTEGER, 2);
                 Bukkit.broadcast(miniMessage().deserialize("<prefix><gray>" + p.getName() + " has picked up the silver crown!</gray>", PREFIX));
             } else if (itemStack.equals(bronzeCrownStack)) {
@@ -99,6 +115,18 @@ public class CrownListener implements Listener {
                             (crownManager.bronzeCrownHolder == null ? "null" : crownManager.bronzeCrownHolder.toString())).getBytes()
             );
         }
+    }
+
+    /**
+     * Handle entity movement.
+     * @param e Entity move event.
+     */
+    @EventHandler
+    public void onEntityMove(EntityMoveEvent e) {
+       if (e.getEntity() instanceof Item item) {
+           if (item.getItemStack().equals(crownManager.bronzeCrown.getItemStack()) || item.getItemStack().equals(crownManager.silverCrown.getItemStack()) || item.getItemStack().equals(crownManager.goldenCrown.getItemStack()))
+               e.setCancelled(true);
+       }
     }
 
     /**

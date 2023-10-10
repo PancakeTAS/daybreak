@@ -48,7 +48,7 @@ import static net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.pars
 public class DaybreakPlugin extends JavaPlugin implements Listener {
 
     /** Size of the border */
-    public static final int BORDER_RADIUS = 512;
+    public static int BORDER_RADIUS = 512;
     /** Data type of the head collection */
     public static final HeadCollectionDataType HEADS_TYPE = new HeadCollectionDataType();
     /** Head collection key */
@@ -124,9 +124,6 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
      * @param w World that was initialized
      */
     public void onChunkyInit(World w) {
-        // set world border
-        w.getWorldBorder().setSize(BORDER_RADIUS * 2);
-
         // preload world
         var chunky = Bukkit.getServer().getServicesManager().load(ChunkyAPI.class);
         chunky.startTask("world", "square", 0, 0, BORDER_RADIUS + (16*16), BORDER_RADIUS + (16*16), "concentric");

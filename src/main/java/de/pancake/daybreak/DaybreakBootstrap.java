@@ -25,6 +25,8 @@ public class DaybreakBootstrap implements PluginBootstrap {
     public static final Path SURVIVORS_FILE = Path.of("survivors.txt");
     /** File listing survivors inbetween resets */
     public static final Path LAST_SESSION_FILE = Path.of("last_survivors.txt");
+    /** File storing the crown holders */
+    public static final Path CROWNS_FILE = Path.of("crowns.txt");
     /** Has server been reset */
     public static boolean RESET = false;
     /** List of deaths from last reset */

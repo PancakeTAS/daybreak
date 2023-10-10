@@ -120,13 +120,15 @@ public class Crown {
         // get random position within border if not specified
         if (pos == null) {
             int x, y, z;
+            Material b;
             do {
                 x = (int) (Math.random() * (BORDER_RADIUS*2) - BORDER_RADIUS);
-                y = (int) (Math.random() * 320) - 32;
                 z = (int) (Math.random() * (BORDER_RADIUS*2) - BORDER_RADIUS);
-            } while (world.getBlockAt(x, y, z).getType() != Material.AIR);
+                y = world.getHighestBlockYAt(x, z);
+                b = world.getBlockAt(x, y, z).getType();
+            } while (b == Material.AIR || b == Material.WATER || b == Material.LAVA);
 
-            pos = new Location(world, x, y, z);
+            pos = new Location(world, x, y + 1, z);
         }
 
         // spawn crown

@@ -3,6 +3,7 @@ package de.pancake.daybreak;
 import de.pancake.daybreak.commands.DaybreakCommand;
 import de.pancake.daybreak.commands.DisconnectCommand;
 import de.pancake.daybreak.commands.HeadsCommand;
+import de.pancake.daybreak.commands.LeaderboardCommand;
 import de.pancake.daybreak.generators.VanillaGenerator;
 import de.pancake.daybreak.listeners.CombatListener;
 import de.pancake.daybreak.listeners.CrownListener;
@@ -66,6 +67,8 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
     @Getter private boolean online = false;
     /** Combat listener */
     public CombatListener combatListener;
+    /** Crown listeners */
+    public CrownListener crownListener;
 
     /**
      * Enable daybreak plugin
@@ -76,12 +79,13 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         Bukkit.getCommandMap().register("daybreak", "db", new DaybreakCommand(this));
         Bukkit.getCommandMap().register("headcollection", "heads", new HeadsCommand());
         Bukkit.getCommandMap().register("disconnect", "dc", new DisconnectCommand(this));
+        Bukkit.getCommandMap().register("leaderboard", "lb", new LeaderboardCommand(this));
 
         // register listeners
         Bukkit.getPluginManager().registerEvents(new SurvivalListener(this), this);
         Bukkit.getPluginManager().registerEvents(new MiscListener(this), this);
-        Bukkit.getPluginManager().registerEvents(combatListener = new CombatListener(this), this);
-        Bukkit.getPluginManager().registerEvents(new CrownListener(), this);
+        Bukkit.getPluginManager().registerEvents(this.combatListener = new CombatListener(this), this);
+        Bukkit.getPluginManager().registerEvents(this.crownListener = new CrownListener(), this);
 
         // load survivors
         if (Files.exists(SURVIVORS_FILE))

@@ -6,13 +6,9 @@ import de.pancake.daybreak.webhook.data.Embed;
 import de.pancake.daybreak.webhook.data.Field;
 import de.pancake.daybreak.webhook.data.Footer;
 import de.pancake.daybreak.webhook.data.Image;
-import lombok.SneakyThrows;
 import org.bukkit.entity.Player;
 
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -49,7 +45,7 @@ public class WebhookExecutor {
         // grab player head information
         var headCollection = (Map<UUID, Integer>) p.getPersistentDataContainer().getOrDefault(HEADS_KEY, HEADS_TYPE, new HashMap<UUID, Integer>());
         var total = headCollection.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
-        var heads = headCollection.entrySet().stream().map(e -> "- " + e.getValue() + "x " + getPlayerName(e.getKey())).collect(Collectors.joining("\n"));
+        var heads = headCollection.entrySet().stream().map(e -> "- " + e.getValue() + "x " + WebhookUtil.getPlayerName(e.getKey())).collect(Collectors.joining("\n"));
 
         // create base embed
         embed.title(msg.replaceAll("§.", ""))
@@ -90,12 +86,12 @@ public class WebhookExecutor {
             .fields(new Field[] {
                     Field.builder()
                             .name("Survivors")
-                            .value(plugin.lastSession.stream().map(WebhookExecutor::getPlayerName).collect(Collectors.joining(", ")))
+                            .value(plugin.lastSession.stream().map(WebhookUtil::getPlayerName).collect(Collectors.joining(", ")))
                             .inline(true)
                             .build(),
                     Field.builder()
                             .name("Deaths")
-                            .value(LAST_DEATHS.stream().map(WebhookExecutor::getPlayerName).collect(Collectors.joining(", ")))
+                            .value(LAST_DEATHS.stream().map(WebhookUtil::getPlayerName).collect(Collectors.joining(", ")))
                             .inline(true)
                             .build()
             })
@@ -105,17 +101,6 @@ public class WebhookExecutor {
 
         // send webhook
         WebhookUtil.send(null, embed.build());
-    }
-
-    /**
-     * Get player name from UUID
-     * @param uuid UUID of player
-     * @return Player name
-     */
-    @SneakyThrows
-    private static String getPlayerName(UUID uuid) {
-        var list = GSON.fromJson(HTTP_CLIENT.send(HttpRequest.newBuilder().GET().uri(URI.create("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString())).build(), HttpResponse.BodyHandlers.ofString()).body(), Map.class);
-        return (String) list.get("name");
     }
 
 }

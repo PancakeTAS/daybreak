@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.world.WorldInitEvent;
 
@@ -39,6 +40,52 @@ public class CrownListener implements Listener {
         this.crowns[0] = new Crown(Crown.CrownType.GOLDEN, crownHolders.get(0).isBlank() ? null : UUID.fromString(crownHolders.get(0)));
         this.crowns[1] = new Crown(Crown.CrownType.SILVER, crownHolders.get(1).isBlank() ? null : UUID.fromString(crownHolders.get(1)));
         this.crowns[2] = new Crown(Crown.CrownType.BRONZE, crownHolders.get(2).isBlank() ? null : UUID.fromString(crownHolders.get(2)));
+    }
+
+    /**
+     * Handle player death event.
+     * @param e Player death event.
+     */
+    @EventHandler @SneakyThrows
+    public void onDeath(PlayerDeathEvent e) {
+        var p = e.getPlayer();
+
+        // check if player holds crown
+        var crown = this.getCrown(p.getUniqueId());
+        if (crown == null)
+            return;
+
+        // check if player was killed
+        var killer = p.getKiller();
+        if (killer != null) {
+
+            // check if killer already holds a crown
+            var heldCrown = this.getCrown(killer.getUniqueId());
+            if (heldCrown != null) {
+                var index = heldCrown.getType().ordinal();
+                var crownIndex = crown.getType().ordinal();
+
+                // check if killer holds higher crown
+                if (index < crownIndex) {
+                    crown.dropCrown(p);
+                    return;
+                }
+
+                // remove crown from killer
+                heldCrown.dropCrown(killer);
+            }
+
+            // transfer crown to killer
+            crown.transferCrown(killer);
+        } else
+            crown.dropCrown(p);
+
+        // save crown holders to file
+        Files.write(CROWNS_FILE,
+                ((this.crowns[0].getHolder() == null ? "": this.crowns[0].getHolder().toString()) + "\n" +
+                (this.crowns[1].getHolder() == null ? "": this.crowns[1].getHolder().toString()) + "\n" +
+                (this.crowns[2].getHolder() == null ? "": this.crowns[2].getHolder().toString()) + "\n").getBytes()
+        );
     }
 
     /**

@@ -41,13 +41,13 @@ public class Crown {
      */
     @Getter @ToString @RequiredArgsConstructor
     public enum CrownType {
-        GOLDEN("Golden Crown", NamedTextColor.GOLD, BarColor.YELLOW, "https://textures.minecraft.net/texture/a645fb0017617de2320bcf9fe2b21c5bc55f5c027060cab7edb929aa1d442327"),
-        SILVER("Silver Crown", NamedTextColor.GRAY, BarColor.WHITE, "https://textures.minecraft.net/texture/fae9e7e3a4e9c656124fd50acb9b685ef5a5c0b61c8abeb98e570252c9a1dd7"),
-        BRONZE("Bronze Crown", NamedTextColor.RED, BarColor.PINK, "https://textures.minecraft.net/texture/9fa86b629ff2b5839aaa3444f044d4de1dfa13d1333a10c7ceaf93726fbc549d");
+        GOLDEN("Golden Crown", NamedTextColor.GOLD, "§6", "https://textures.minecraft.net/texture/a645fb0017617de2320bcf9fe2b21c5bc55f5c027060cab7edb929aa1d442327"),
+        SILVER("Silver Crown", NamedTextColor.GRAY, "§7", "https://textures.minecraft.net/texture/fae9e7e3a4e9c656124fd50acb9b685ef5a5c0b61c8abeb98e570252c9a1dd7"),
+        BRONZE("Bronze Crown", NamedTextColor.RED, "§c", "https://textures.minecraft.net/texture/9fa86b629ff2b5839aaa3444f044d4de1dfa13d1333a10c7ceaf93726fbc549d");
 
         private final String name;
         private final TextColor color;
-        private final BarColor bar;
+        private final String bar;
         private final String texture;
     }
 
@@ -71,7 +71,7 @@ public class Crown {
     public Crown(CrownType type, UUID holder) {
         this.type = type;
         this.holder = holder;
-        this.bossBar = Bukkit.createBossBar("null", this.type.getBar(), BarStyle.SOLID);
+        this.bossBar = Bukkit.createBossBar("null", BarColor.WHITE, BarStyle.SOLID);
         this.bossBar.setVisible(false);
         this.bossBar.setProgress(1.0);
 
@@ -153,7 +153,7 @@ public class Crown {
         this.entity.setVelocity(new Vector(0, 0, 0));
 
         // create bossbar
-        this.bossBar.setTitle(pos.getBlockX() + " " + pos.getBlockY() + " " + pos.getBlockZ());
+        this.bossBar.setTitle(this.type.getBar() + this.type.getName() + " at " + pos.getBlockX() + ", " + pos.getBlockY() + ", " + pos.getBlockZ());
         this.bossBar.setVisible(true);
     }
 

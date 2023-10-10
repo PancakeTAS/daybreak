@@ -112,7 +112,7 @@ public class MiscListener implements Listener {
             msg = "<gold>" + p.getName() + "</gold> <red>logged out during combat!";
 
         e.deathMessage(miniMessage().deserialize("<prefix><msg>", PREFIX, parsed("msg", msg)));
-        this.plugin.webhookExecutor.sendDeathMessage(p, killer, omsg);
+        this.plugin.webhookExecutor.sendDeathMessage(p, killer, killer == null ? null : this.plugin.crownListener.getCrown(killer.getUniqueId()), omsg);
     }
 
 }

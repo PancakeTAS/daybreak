@@ -4,11 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import de.pancake.daybreak.webhook.data.Embed;
 import de.pancake.daybreak.webhook.data.Request;
+import lombok.SneakyThrows;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Utility class for sending webhook messages.
@@ -38,6 +41,17 @@ public class WebhookUtil {
         HTTP_CLIENT.sendAsync(HttpRequest.newBuilder(WEBHOOK_URL)
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(request))).header("Content-Type", "application/json")
                 .build(), HttpResponse.BodyHandlers.discarding());
+    }
+
+    /**
+     * Get player name from UUID
+     * @param uuid UUID of player
+     * @return Player name
+     */
+    @SneakyThrows
+    public static String getPlayerName(UUID uuid) {
+        var list = GSON.fromJson(HTTP_CLIENT.send(HttpRequest.newBuilder().GET().uri(URI.create("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString())).build(), HttpResponse.BodyHandlers.ofString()).body(), Map.class);
+        return (String) list.get("name");
     }
 
 }

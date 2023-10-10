@@ -96,7 +96,7 @@ public class Crown {
      */
     public void transferCrown(Player player) {
         this.holder = player.getUniqueId();
-        Bukkit.broadcast(miniMessage().deserialize("<prefix><gold><player></gold> <red>stole the </red><crown><red>!</red>", PREFIX, unparsed("player", player.getName()), component("crown", Component.text(this.type.getName()).color(this.type.getColor()))));
+        Bukkit.broadcast(miniMessage().deserialize("<prefix><gold><player></gold> <red>stole the</red> <crown><red>!</red>", PREFIX, unparsed("player", player.getName()), component("crown", Component.text(this.type.getName()).color(this.type.getColor()))));
     }
 
     /**
@@ -106,7 +106,7 @@ public class Crown {
     public void dropCrown(Player player) {
         this.holder = null;
         this.spawnCrownEntity(player.getLocation());
-        Bukkit.broadcast(miniMessage().deserialize("<prefix><gold><player></gold> <red>dropped the </red> <crown><red>!</red>", PREFIX, unparsed("player", player.getName()), component("crown", Component.text(this.type.getName()).color(this.type.getColor()))));
+        Bukkit.broadcast(miniMessage().deserialize("<prefix><gold><player></gold> <red>dropped the</red> <crown><red>!</red>", PREFIX, unparsed("player", player.getName()), component("crown", Component.text(this.type.getName()).color(this.type.getColor()))));
     }
 
     /**

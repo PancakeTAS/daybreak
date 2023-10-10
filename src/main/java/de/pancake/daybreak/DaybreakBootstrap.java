@@ -1,5 +1,6 @@
 package de.pancake.daybreak;
 
+import de.pancake.daybreak.features.crowns.CrownManager;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import org.codehaus.plexus.util.FileUtils;
@@ -48,6 +49,37 @@ public class DaybreakBootstrap implements PluginBootstrap {
             var stats = survivors.stream().distinct().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/stats/" + uuid + ".json"))));
             var playerdata = survivors.stream().distinct().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/playerdata/" + uuid + ".dat"))));
             var advancements = survivors.stream().distinct().collect(Collectors.toMap(uuid -> uuid, uuid -> tryRead(Path.of("world/advancements/" + uuid + ".json"))));
+
+            // read crown holders
+            String goldenCrownHolder = null;
+            String silverCrownHolder = null;
+            String bronzeCrownHolder = null;
+
+            if (Files.exists(CrownManager.CROWNS_FILE)) {
+                var crownHolders = Files.readAllLines(CrownManager.CROWNS_FILE);
+                goldenCrownHolder = crownHolders.get(0);
+                silverCrownHolder = crownHolders.get(1);
+                bronzeCrownHolder = crownHolders.get(2);
+            }
+
+            // check if any of the holders aren't survivors
+            if (!survivors.contains(goldenCrownHolder)) {
+                goldenCrownHolder = null;
+            }
+            if (!survivors.contains(silverCrownHolder)) {
+                silverCrownHolder = null;
+            }
+            if (!survivors.contains(bronzeCrownHolder)) {
+                bronzeCrownHolder = null;
+            }
+
+            // update crowns file to remove non survivors (only happens if the crown holder doesn't log on for the day)
+            Files.write(CrownManager.CROWNS_FILE,
+                    ((goldenCrownHolder == null ? "null" : goldenCrownHolder) + "\n" +
+                            (silverCrownHolder == null ? "null" : silverCrownHolder) + "\n" +
+                            (bronzeCrownHolder == null ? "null" : bronzeCrownHolder)).getBytes()
+            );
+
 
             // read deaths
             try (var stream = Files.list(Path.of("world/playerdata/"))) {

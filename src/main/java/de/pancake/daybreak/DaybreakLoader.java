@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
+import static de.pancake.daybreak.DaybreakPlugin.BORDER_RADIUS;
+
 /**
  * Loader of the plugin
  * @author Pancake
@@ -60,6 +62,7 @@ public class DaybreakLoader implements PluginLoader {
         // get render distance and world radius
         var renderDistance = Integer.parseInt(properties.getProperty("view-distance"));
         var worldRadius = Integer.parseInt(properties.getProperty("max-world-size")) / 16;
+        BORDER_RADIUS = Integer.parseInt(properties.getProperty("max-world-size"));
 
         /* check bukkit.yml */
         logger.info("Checking bukkit.yml...");

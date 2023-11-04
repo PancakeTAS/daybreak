@@ -199,7 +199,7 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         pdc.set(HEADS_KEY, HEADS_TYPE, data);
 
         // send message to killer
-        var total = data.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
+        var total = data.values().stream().mapToInt(i -> i).sum();
         killer.sendMessage(miniMessage().deserialize("<prefix>You have collected the head of <gold>" + p.getName() + "</gold>. You now have <gold>" + total + "</gold> head" + (total == 1 ? "" : "s") + ".", PREFIX));
     }
 

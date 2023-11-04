@@ -47,7 +47,7 @@ public class WebhookExecutor {
 
         // grab player head information
         var headCollection = (Map<UUID, Integer>) p.getPersistentDataContainer().getOrDefault(HEADS_KEY, HEADS_TYPE, new HashMap<UUID, Integer>());
-        var total = headCollection.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
+        var total = headCollection.values().stream().mapToInt(i -> i).sum();
         var heads = headCollection.entrySet().stream().map(e -> "- " + e.getValue() + "x " + WebhookUtil.getPlayerName(e.getKey())).collect(Collectors.joining("\n"));
 
         // create base embed

@@ -92,7 +92,7 @@ public class Crown {
 
     /**
      * Transfer crown from one player to another
-     * @param target The player to transfer the crown to
+     * @param player The player to transfer the crown to
      */
     public void transferCrown(Player player) {
         this.holder = player.getUniqueId();

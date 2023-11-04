@@ -49,23 +49,24 @@ public class CrownListener implements Listener {
         if (Files.exists(CROWNS_FILE))
             crownHolders = Files.readAllLines(CROWNS_FILE);
 
-        if (!crownHolders.get(0).isBlank()) {
-            var uuid = UUID.fromString(crownHolders.get(0));
-            if (this.plugin.lastSession.contains(uuid))
-                this.crowns[0] = new Crown(Crown.CrownType.GOLDEN, uuid);
-        }
+        UUID uuid;
+        if (!crownHolders.get(0).isBlank())
+            uuid = UUID.fromString(crownHolders.get(0));
+        else
+            uuid = null;
+        this.crowns[0] = new Crown(Crown.CrownType.GOLDEN, this.plugin.lastSession.contains(uuid) ? uuid : null);
 
-        if (!crownHolders.get(1).isBlank()) {
-            var uuid = UUID.fromString(crownHolders.get(1));
-            if (this.plugin.lastSession.contains(uuid))
-                this.crowns[1] = new Crown(Crown.CrownType.SILVER, uuid);
-        }
+        if (!crownHolders.get(1).isBlank())
+            uuid = UUID.fromString(crownHolders.get(1));
+        else
+            uuid = null;
+        this.crowns[1] = new Crown(Crown.CrownType.SILVER, this.plugin.lastSession.contains(uuid) ? uuid : null);
 
-        if (!crownHolders.get(2).isBlank()) {
-            var uuid = UUID.fromString(crownHolders.get(2));
-            if (this.plugin.lastSession.contains(uuid))
-                this.crowns[2] = new Crown(Crown.CrownType.BRONZE, uuid);
-        }
+        if (!crownHolders.get(2).isBlank())
+            uuid = UUID.fromString(crownHolders.get(2));
+        else
+            uuid = null;
+        this.crowns[2] = new Crown(Crown.CrownType.BRONZE, this.plugin.lastSession.contains(uuid) ? uuid : null);
     }
 
     /**

@@ -45,24 +45,24 @@ public class CrownListener implements Listener {
     @EventHandler @SneakyThrows
     public void onWorldInit(WorldInitEvent e) {
         // load crown holders from file
-        var crownHolders = List.of("", "", "");
+        var crownHolders = List.of("null", "null", "null");
         if (Files.exists(CROWNS_FILE))
             crownHolders = Files.readAllLines(CROWNS_FILE);
 
         UUID uuid;
-        if (!crownHolders.get(0).isBlank())
+        if (!crownHolders.get(0).trim().startsWith("null"))
             uuid = UUID.fromString(crownHolders.get(0));
         else
             uuid = null;
         this.crowns[0] = new Crown(Crown.CrownType.GOLDEN, this.plugin.lastSession.contains(uuid) ? uuid : null);
 
-        if (!crownHolders.get(1).isBlank())
+        if (!crownHolders.get(1).trim().startsWith("null"))
             uuid = UUID.fromString(crownHolders.get(1));
         else
             uuid = null;
         this.crowns[1] = new Crown(Crown.CrownType.SILVER, this.plugin.lastSession.contains(uuid) ? uuid : null);
 
-        if (!crownHolders.get(2).isBlank())
+        if (!crownHolders.get(2).trim().startsWith("null"))
             uuid = UUID.fromString(crownHolders.get(2));
         else
             uuid = null;
@@ -109,9 +109,9 @@ public class CrownListener implements Listener {
 
         // save crown holders to file
         Files.write(CROWNS_FILE,
-                ((this.crowns[0].getHolder() == null ? "": this.crowns[0].getHolder().toString()) + "\n" +
-                (this.crowns[1].getHolder() == null ? "": this.crowns[1].getHolder().toString()) + "\n" +
-                (this.crowns[2].getHolder() == null ? "": this.crowns[2].getHolder().toString()) + "\n").getBytes()
+                ((this.crowns[0].getHolder() == null ? "null" : this.crowns[0].getHolder().toString()) + "\n" +
+                (this.crowns[1].getHolder() == null ? "null" : this.crowns[1].getHolder().toString()) + "\n" +
+                (this.crowns[2].getHolder() == null ? "null" : this.crowns[2].getHolder().toString()) + "\n").getBytes()
         );
     }
 
@@ -154,9 +154,9 @@ public class CrownListener implements Listener {
 
         // save crown holders to file
         Files.write(CROWNS_FILE,
-                ((this.crowns[0].getHolder() == null ? "": this.crowns[0].getHolder().toString()) + "\n" +
-                (this.crowns[1].getHolder() == null ? "": this.crowns[1].getHolder().toString()) + "\n" +
-                (this.crowns[2].getHolder() == null ? "": this.crowns[2].getHolder().toString()) + "\n").getBytes()
+                ((this.crowns[0].getHolder() == null ? "null" : this.crowns[0].getHolder().toString()) + "\n" +
+                (this.crowns[1].getHolder() == null ? "null" : this.crowns[1].getHolder().toString()) + "\n" +
+                (this.crowns[2].getHolder() == null ? "null" : this.crowns[2].getHolder().toString()) + "\n").getBytes()
         );
     }
 

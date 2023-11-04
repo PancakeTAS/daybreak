@@ -1,5 +1,6 @@
 package de.pancake.daybreak.listeners;
 
+import de.pancake.daybreak.DaybreakPlugin;
 import de.pancake.daybreak.crowns.Crown;
 import lombok.SneakyThrows;
 import org.bukkit.entity.Item;
@@ -23,8 +24,19 @@ import static de.pancake.daybreak.DaybreakBootstrap.CROWNS_FILE;
  */
 public class CrownListener implements Listener {
 
+    /** Daybreak plugin instance */
+    private final DaybreakPlugin plugin;
+
     /** Crown instances */
     public final Crown[] crowns = new Crown[3];
+
+    /**
+     * Initialize crown listener.
+     * @param plugin Daybreak plugin instance.
+     */
+    public CrownListener(DaybreakPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     /**
      * Handle world init event.
@@ -37,9 +49,23 @@ public class CrownListener implements Listener {
         if (Files.exists(CROWNS_FILE))
             crownHolders = Files.readAllLines(CROWNS_FILE);
 
-        this.crowns[0] = new Crown(Crown.CrownType.GOLDEN, crownHolders.get(0).isBlank() ? null : UUID.fromString(crownHolders.get(0)));
-        this.crowns[1] = new Crown(Crown.CrownType.SILVER, crownHolders.get(1).isBlank() ? null : UUID.fromString(crownHolders.get(1)));
-        this.crowns[2] = new Crown(Crown.CrownType.BRONZE, crownHolders.get(2).isBlank() ? null : UUID.fromString(crownHolders.get(2)));
+        if (!crownHolders.get(0).isBlank()) {
+            var uuid = UUID.fromString(crownHolders.get(0));
+            if (this.plugin.lastSession.contains(uuid))
+                this.crowns[0] = new Crown(Crown.CrownType.GOLDEN, uuid);
+        }
+
+        if (!crownHolders.get(1).isBlank()) {
+            var uuid = UUID.fromString(crownHolders.get(1));
+            if (this.plugin.lastSession.contains(uuid))
+                this.crowns[1] = new Crown(Crown.CrownType.SILVER, uuid);
+        }
+
+        if (!crownHolders.get(2).isBlank()) {
+            var uuid = UUID.fromString(crownHolders.get(2));
+            if (this.plugin.lastSession.contains(uuid))
+                this.crowns[2] = new Crown(Crown.CrownType.BRONZE, uuid);
+        }
     }
 
     /**

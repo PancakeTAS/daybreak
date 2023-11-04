@@ -86,7 +86,7 @@ public class DaybreakPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new SurvivalListener(this), this);
         Bukkit.getPluginManager().registerEvents(new MiscListener(this), this);
         Bukkit.getPluginManager().registerEvents(this.combatListener = new CombatListener(this), this);
-        Bukkit.getPluginManager().registerEvents(this.crownListener = new CrownListener(), this);
+        Bukkit.getPluginManager().registerEvents(this.crownListener = new CrownListener(this), this);
 
         // load survivors
         if (Files.exists(SURVIVORS_FILE))

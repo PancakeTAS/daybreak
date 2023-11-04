@@ -10,6 +10,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,7 +32,7 @@ public class DaybreakBootstrap implements PluginBootstrap {
     /** Has server been reset */
     public static boolean RESET = false;
     /** List of deaths from last reset */
-    public static List<UUID> LAST_DEATHS;
+    public static List<UUID> LAST_DEATHS = new ArrayList<>();
 
     /** The logger of the plugin */
     private ComponentLogger logger;

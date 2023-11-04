@@ -47,7 +47,7 @@ public class CombatListener implements Listener {
 
                 if (val > 0) {
                     entry.getKey().sendActionBar(miniMessage().deserialize("<red>You are in combat. Do not log off.</red>"));
-                } else if (val <= 0) {
+                } else {
                     entry.getKey().sendActionBar(miniMessage().deserialize("<green>You are no longer in combat.</green>"));
                     this.timers.remove(entry.getKey());
                 }
@@ -61,7 +61,7 @@ public class CombatListener implements Listener {
 
                 if (val > 0) {
                     entry.getKey().sendActionBar(miniMessage().deserialize("<gold>Disconnecting in " + val + "</gold>"));
-                } else if (val <= 0) {
+                } else {
                     this.disconnects.remove(entry.getKey());
                     this.safe.add(entry.getKey());
                     entry.getKey().kick(miniMessage().deserialize("<prefix><green>You have safely disconnected.</green>", PREFIX));

@@ -45,7 +45,7 @@ public class HeadsCommand extends Command {
         if (sender instanceof Player p) {
             // grab player head collection
             var heads = (Map<UUID, Integer>) p.getPersistentDataContainer().getOrDefault(HEADS_KEY, HEADS_TYPE, new HashMap<UUID, Integer>());
-            var total = heads.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
+            var total = heads.values().stream().mapToInt(i -> i).sum();
 
             if (total == 0) {
                 sender.sendMessage(miniMessage().deserialize("<prefix><red>You don't have any heads yet!", PREFIX));

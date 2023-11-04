@@ -145,7 +145,7 @@ public class CrownListener implements Listener {
 
     /**
      * Get crown from entity
-     * @param item The item entity.
+     * @param uuid The entity uuid.
      * @return The crown instance or null if not found.
      */
     public Crown getCrown(UUID uuid) {

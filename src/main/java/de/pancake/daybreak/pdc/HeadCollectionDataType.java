@@ -19,7 +19,7 @@ public class HeadCollectionDataType implements PersistentDataType<String, Map> {
      * Convert a complex value to a primitive value.
      * @param complex the complex object instance
      * @param context the context this operation is running in
-     * @return
+     * @return the primitive value
      */
     @Override
     public @NotNull String toPrimitive(@NotNull Map complex, @NotNull PersistentDataAdapterContext context) {
@@ -30,7 +30,7 @@ public class HeadCollectionDataType implements PersistentDataType<String, Map> {
      * Convert a primitive value to a complex value.
      * @param primitive the primitive value
      * @param context the context this operation is running in
-     * @return
+     * @return the complex object instance
      */
     @Override
     public @NotNull Map fromPrimitive(@NotNull String primitive, @NotNull PersistentDataAdapterContext context) {

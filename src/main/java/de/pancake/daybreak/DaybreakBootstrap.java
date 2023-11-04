@@ -87,8 +87,7 @@ public class DaybreakBootstrap implements PluginBootstrap {
 
             RESET = true;
         } catch (Exception e) {
-            this.logger.error("reset.lock found, resetting server...");
-            e.printStackTrace();
+            this.logger.error("reset.lock found, resetting server...", e);
             System.exit(-1);
         }
     }
@@ -106,8 +105,7 @@ public class DaybreakBootstrap implements PluginBootstrap {
 
             return Files.readAllBytes(path);
         } catch (Exception e) {
-            this.logger.error("Failed to read file " + path + "!");
-            e.printStackTrace();
+            this.logger.error("Failed to read file " + path + "!", e);
             System.exit(-1);
         }
         return null;
@@ -122,8 +120,7 @@ public class DaybreakBootstrap implements PluginBootstrap {
         try {
             Files.write(path, data);
         } catch (Exception e) {
-            this.logger.error("Failed to write file " + path + "!");
-            e.printStackTrace();
+            this.logger.error("Failed to write file " + path + "!", e);
             System.exit(-1);
         }
     }

@@ -3,20 +3,23 @@ package de.pancake.daybreak.listeners;
 import de.pancake.daybreak.DaybreakPlugin;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 
-import static de.pancake.daybreak.listeners.SurvivalListener.PREFIX;
+import static de.pancake.daybreak.DaybreakPlugin.PREFIX;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 import static net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.*;
+import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection;
 
 /**
  * Misc listener for the daybreak plugin.
@@ -80,15 +83,27 @@ public class MiscListener implements Listener {
     }
 
     /**
+     * Handle inventory click event.
+     * @param e Inventory click event.
+     */
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        var item = e.getInventory().getItem(0);
+        if (!e.getWhoClicked().isOp() && item != null && item.getType() == Material.PLAYER_HEAD)
+            e.setCancelled(true);
+    }
+
+    /**
      * Handle player death event.
      * @param e Player death event.
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH) // run after other event handlers
     public void onPlayerDeath(PlayerDeathEvent e) {
         var p = e.getPlayer();
         var killer = p.getKiller();
 
-        var msg = LegacyComponentSerializer.legacySection().serialize(e.deathMessage()).replace(p.getName(), "<gold>" + p.getName() + "</gold><red>");
+        var omsg = legacySection().serialize(e.deathMessage());
+        var msg = omsg.replace(p.getName(), "<gold>" + p.getName() + "</gold><red>");
 
         if (killer != null && killer != p)
             msg = msg.replace(killer.getName(), "<gold>" + killer.getName() + "</gold><red>");
@@ -97,6 +112,7 @@ public class MiscListener implements Listener {
             msg = "<gold>" + p.getName() + "</gold> <red>logged out during combat!";
 
         e.deathMessage(miniMessage().deserialize("<prefix><msg>", PREFIX, parsed("msg", msg)));
+        this.plugin.webhookExecutor.sendDeathMessage(p, killer, killer == null ? null : this.plugin.crownListener.getCrown(killer.getUniqueId()), omsg);
     }
 
 }

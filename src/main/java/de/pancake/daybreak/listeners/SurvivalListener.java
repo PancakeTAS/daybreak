@@ -1,7 +1,6 @@
 package de.pancake.daybreak.listeners;
 
 import de.pancake.daybreak.DaybreakPlugin;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -17,16 +16,12 @@ import java.util.Map;
 
 import static de.pancake.daybreak.DaybreakPlugin.BORDER_RADIUS;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
-import static net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.parsed;
 
 /**
  * Survival listener for the daybreak plugin.
  * @author Pancake
  */
 public class SurvivalListener implements Listener {
-
-    /** Prefix for messages */
-    public final static TagResolver.Single PREFIX = parsed("prefix", "<gold>»</gold> <red>");
 
     /** Daybreak plugin instance */
     private final DaybreakPlugin plugin;
@@ -72,13 +67,13 @@ public class SurvivalListener implements Listener {
                     <prefix>Daybreak is a <gold>hardcore survival server</gold> <red>that resets every day.</red>
                     <prefix>If you die, you will be <gold>banned</gold> <red>for the rest of the day.</red>
                     <prefix>If you want to preserve your items to the next map,
-                    <prefix>you have to survive at least 5 minutes.
-                    <prefix>
-                    <prefix>Your spawn protection towards other players will expire in 5 minutes.
-                    """, PREFIX));
+                    <prefix>you have to survive at least 5 minutes.""", DaybreakPlugin.PREFIX));
 
             // add spawn protection
-            this.spawnProtection.put(player, System.currentTimeMillis());
+            if (player.getInventory().isEmpty()) {
+                this.spawnProtection.put(player, System.currentTimeMillis());
+                player.sendMessage(miniMessage().deserialize("<prefix>\n<prefix>Your spawn protection towards other players will expire in 5 minutes.", DaybreakPlugin.PREFIX));
+            }
 
             // spread player
             var x = (int) (Math.random() * BORDER_RADIUS * 2) - BORDER_RADIUS;
@@ -96,7 +91,7 @@ public class SurvivalListener implements Listener {
             if (player.getLastLogin() != login)
                 return;
             this.plugin.addSurvivor(player.getUniqueId());
-            player.sendMessage(miniMessage().deserialize("<prefix>You are now marked as a survivor", PREFIX));
+            player.sendMessage(miniMessage().deserialize("<prefix>You are now marked as a survivor", DaybreakPlugin.PREFIX));
         }, 20L*60*5);
     }
 
@@ -106,8 +101,19 @@ public class SurvivalListener implements Listener {
      */
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof Player p && e.getDamager() instanceof Player && (System.currentTimeMillis() - this.spawnProtection.getOrDefault(p, 0L)) < 1000*60*5)
-            e.setCancelled(true);
+        if (e.getEntity() instanceof Player p && e.getDamager() instanceof Player k) {
+            // victim has spawn protection
+            if (System.currentTimeMillis() - this.spawnProtection.getOrDefault(p, 0L) < 1000*60*5) {
+                k.sendMessage(miniMessage().deserialize("<prefix><red>This player has spawn protection!", DaybreakPlugin.PREFIX));
+                e.setCancelled(true);
+            }
+
+            // attacker has spawn protection
+            else if (System.currentTimeMillis() - this.spawnProtection.getOrDefault(k, 0L) < 1000*60*5) {
+                k.sendMessage(miniMessage().deserialize("<prefix><red>You have spawn protection!", DaybreakPlugin.PREFIX));
+                e.setCancelled(true);
+            }
+        }
     }
 
     /**

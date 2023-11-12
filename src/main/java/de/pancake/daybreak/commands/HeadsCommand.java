@@ -57,7 +57,10 @@ public class HeadsCommand extends Command {
             for (var entry : heads.entrySet()) {
                 var skull = new ItemStack(Material.PLAYER_HEAD, entry.getValue());
                 var meta = (SkullMeta) skull.getItemMeta();
-                meta.setOwningPlayer(Bukkit.getOfflinePlayer(entry.getKey()));
+
+                meta.displayName(Component.text(""));
+                meta.setPlayerProfile(Bukkit.getOfflinePlayer(entry.getKey()).getPlayerProfile());
+
                 meta.displayName(miniMessage().deserialize("<gold><!italic>" + Bukkit.getOfflinePlayer(entry.getKey()).getName(), PREFIX));
                 skull.setItemMeta(meta);
                 inv.addItem(skull);

@@ -54,19 +54,19 @@ public class CrownListener implements Listener {
             uuid = UUID.fromString(crownHolders.get(0));
         else
             uuid = null;
-        this.crowns[0] = new Crown(Crown.CrownType.GOLDEN, this.plugin.lastSession.contains(uuid) ? uuid : null);
+        this.crowns[0] = new Crown(Crown.CrownType.GOLDEN, (this.plugin.lastSession.contains(uuid) || this.plugin.isSurvivor(uuid)) ? uuid : null);
 
         if (!crownHolders.get(1).trim().startsWith("null"))
             uuid = UUID.fromString(crownHolders.get(1));
         else
             uuid = null;
-        this.crowns[1] = new Crown(Crown.CrownType.SILVER, this.plugin.lastSession.contains(uuid) ? uuid : null);
+        this.crowns[1] = new Crown(Crown.CrownType.SILVER, (this.plugin.lastSession.contains(uuid) || this.plugin.isSurvivor(uuid)) ? uuid : null);
 
         if (!crownHolders.get(2).trim().startsWith("null"))
             uuid = UUID.fromString(crownHolders.get(2));
         else
             uuid = null;
-        this.crowns[2] = new Crown(Crown.CrownType.BRONZE, this.plugin.lastSession.contains(uuid) ? uuid : null);
+        this.crowns[2] = new Crown(Crown.CrownType.BRONZE, (this.plugin.lastSession.contains(uuid) || this.plugin.isSurvivor(uuid)) ? uuid : null);
     }
 
     /**

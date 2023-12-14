@@ -6,7 +6,7 @@ plugins {
 
 // Update plugin information
 base {
-    group = "de.pancake"
+    group = "gay.pancake"
     archivesName = "daybreak"
 }
 

@@ -1,16 +1,14 @@
 package gay.pancake.daybreak.webhook;
 
-import com.google.gson.Gson;
+import gay.pancake.daybreak.DaybreakBootstrap;
 import gay.pancake.daybreak.DaybreakPlugin;
 import gay.pancake.daybreak.crowns.Crown;
 import gay.pancake.daybreak.webhook.data.Embed;
 import gay.pancake.daybreak.webhook.data.Field;
 import gay.pancake.daybreak.webhook.data.Footer;
 import gay.pancake.daybreak.webhook.data.Image;
-import gay.pancake.daybreak.DaybreakBootstrap;
 import org.bukkit.entity.Player;
 
-import java.net.http.HttpClient;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -26,12 +24,6 @@ import static gay.pancake.daybreak.webhook.WebhookUtil.getPlayerName;
  * @author Pancake
  */
 public class WebhookExecutor {
-
-    /** Gson instance */
-    private static final Gson GSON = new Gson();
-
-    /** Http client instance */
-    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
 
     /**
      * Send death message to webhook.

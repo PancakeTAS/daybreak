@@ -87,7 +87,7 @@ public class SurvivalListener implements Listener {
         // add timer for adding player to survivors list
         var login = player.getLastLogin();
         Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
-            if (player.getLastLogin() != login)
+            if (player.getLastLogin() != login || !player.isOnline())
                 return;
             this.plugin.addSurvivor(player.getUniqueId());
             player.sendMessage(miniMessage().deserialize("<prefix>You are now marked as a survivor", DaybreakPlugin.PREFIX));

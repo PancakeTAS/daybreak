@@ -53,7 +53,7 @@ public class WebhookExecutor {
                     .replace("%HS%", total == 1 ? "" : "s")
                     .replace("%HEADS%", heads))
             .color(0x9F23EB)
-            .thumbnail(Image.builder().url("https://crafatar.com/avatars/" + p.getUniqueId() + "?overlay").build());
+            .thumbnail(Image.builder().url("https://mc-heads.net/avatar/" + p.getUniqueId() + "/160").build());
 
 
         // add killer footer
@@ -61,11 +61,11 @@ public class WebhookExecutor {
             if (c == null)
                 embed.footer(Footer.builder()
                     .text("Murdered by " + k.getName())
-                    .icon_url("https://crafatar.com/avatars/" + k.getUniqueId() + "?overlay").build());
+                    .icon_url("https://mc-heads.net/avatar/" + k.getUniqueId() + "/160").build());
             else
                 embed.footer(Footer.builder()
                     .text(k.getName() + " stole the " + c.getType().getName() + " and is now rank " + (c.getType().ordinal()+1) + ".")
-                    .icon_url("https://crafatar.com/avatars/" + k.getUniqueId() + "?overlay").build());
+                    .icon_url("https://mc-heads.net/avatar/" + k.getUniqueId() + "/160").build());
 
         // send webhook
         WebhookUtil.send(null, embed.build());
